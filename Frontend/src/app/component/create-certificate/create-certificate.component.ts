@@ -34,6 +34,7 @@ export class CreateCertificateComponent implements OnInit {
 
   minDate = new Date();
   subjects: Entity[] = [];
+  //ovo ces morati da promenis posto on fakticki bira sertifikate a ne issuer-a. Vidi kako i sta ces slati sve ovde na frontend
   issuers: Entity[] = [];
   createdNewSubject: Subscription;
   constructor(private toastr: ToastrService, private formBuilder: FormBuilder, public dialog: MatDialog, private subjectService: SubjectService,
