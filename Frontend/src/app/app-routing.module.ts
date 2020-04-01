@@ -17,7 +17,7 @@ const routes: Routes = [
   },
   //******************* ADMIN PAGES ************************
   {
-    path: 'certificates',
+    path: 'admin/certificates',
     component: ListCertificatesComponent,
     canActivate: [AdminGuard],
   },

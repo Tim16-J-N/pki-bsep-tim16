@@ -41,6 +41,7 @@ import { ChooseTemplateComponent } from './component/choose-template/choose-temp
     BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
+    LayoutModule,
     ToastrModule.forRoot({
       timeOut: 3000,
       positionClass: 'toast-top-right',
@@ -53,11 +54,6 @@ import { ChooseTemplateComponent } from './component/choose-template/choose-temp
   entryComponents: [
     AddSubjectComponent,
     CreateCertificateComponent,
-    LayoutModule,
-    ReactiveFormsModule,
-    FormsModule,
-    HttpClientModule,
-    MaterialModule,
     ListCertificatesComponent,
     ChooseTemplateComponent,
   ],

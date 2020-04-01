@@ -1,44 +1,29 @@
-.card-section { 
-    position: relative; 
-    bottom: 60px; 
+mat-card {
+  max-width: 700px;
+  margin: 2em auto;
 }
 
-.card-block { 
-    padding: 40px; 
-    width: 50%;    
-    margin: auto; 
-}
-
-.subject-card {
-    max-width: 500px;
-}
-  
-.issuer-card {
-    max-width: 500px;
+.table {
+  margin-bottom: 0;
 }
   
 .form-full-width {
-    width: 100%;
+  width: 100%;
 }
 
-.page-title { 
-    font-size: 15px; 
-    line-height: 1;
-  
-}
-.first {
-    width: 35%
-  }
-
-  
 .table-font {
-    font-size: 115%;
-    margin-bottom: 15px;
-  }
-  .form-full-width-td {
-    width: 100%;
-  }
-  .mat-dialog-actions {
-    justify-content: flex-end;
-  }
+  font-size: 110%;
+}
+
+.first {
+  width: 30%
+}
+
+.date-err {
+  margin-top: .66667em;
+  font-size: 80%;
+}
   
+.field-width {
+  width: 50%;
+}

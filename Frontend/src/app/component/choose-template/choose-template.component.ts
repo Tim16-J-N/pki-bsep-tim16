@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Template } from './../../model/template';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
@@ -21,6 +22,7 @@ export class ChooseTemplateComponent implements OnInit {
   codeSigning = new Template(true, true, false, true, false, false, false, false, false, true);
 
   constructor(
+    private router: Router,
     private formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<ChooseTemplateComponent>
   ) {
@@ -39,5 +41,6 @@ export class ChooseTemplateComponent implements OnInit {
     this.templateSelected = this.chooseTemplateForm.value.template;
     this.isSelfSigned = this.chooseTemplateForm.value.selfSigned;
     this.dialogRef.close();
+    this.router.navigate(['/admin/create-certificate']);
   }
 }

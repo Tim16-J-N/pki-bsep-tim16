@@ -2,12 +2,8 @@
     <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
         [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
         <mat-toolbar>Menu</mat-toolbar>
-        <mat-nav-list>
-            <a mat-list-item routerLink="/admin/create-certificate">Create certificate</a>
-        </mat-nav-list>
-
         <mat-nav-list *ngIf="isLoggedIn()">
-            <a mat-list-item routerLink="/certificates">List certificates</a>
+            <a mat-list-item routerLink="admin/certificates">List certificates</a>
             <a mat-list-item (click)="logout()">Log out</a>
         </mat-nav-list>
     </mat-sidenav>

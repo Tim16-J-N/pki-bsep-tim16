@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
 
   redirectToHomePage() {
     if (this.userService.isLoggedIn()) {
-      this.router.navigate(['/certificates']);
+      this.router.navigate(['admin/certificates']);
     }
   }
 

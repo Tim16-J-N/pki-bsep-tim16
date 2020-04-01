@@ -2,21 +2,22 @@
 <mat-dialog-content class="dialog-class">
     <form [formGroup]="chooseTemplateForm" class="form-full-width">
         <div class="cc-selector">
-            <input id="blank" type="radio" formControlName="template" [value]="blank" />
+            <input id="blank" class="ml-2 mr-2" type="radio" formControlName="template" [value]="blank" />
             <label class=" label-cc blank" for="blank"></label>
-            <input id="ca" type="radio" formControlName="template" [value]="ca" />
+            <input id="ca" class="ml-2 mr-2" type="radio" formControlName="template" [value]="ca" />
             <label class="label-cc ca" for="ca"></label>
-            <input id="sslServer" type="radio" formControlName="template" [value]="sslServer" />
+            <input id="sslServer" class="ml-2 mr-2" type="radio" formControlName="template" [value]="sslServer" />
             <label class="label-cc sslServer" for="sslServer"></label>
             <br />
-            <input id="sslClient" type="radio" formControlName="template" [value]="sslClient" />
+            <input id="sslClient" class="ml-2 mr-2" type="radio" formControlName="template" [value]="sslClient" />
             <label class="label-cc sslClient" for="sslClient"></label>
-            <input id="codeSigning" type="radio" formControlName="template" [value]="codeSigning" />
+            <input id="codeSigning" class="ml-2 mr-2" type="radio" formControlName="template" [value]="codeSigning" />
             <label class="label-cc codeSigning" for="codeSigning"></label>
         </div>
-        <div>
-            <mat-checkbox class="chk-self-signed" formControlName="selfSigned">Self-signed certificate</mat-checkbox>
-            <div align="end">
+        <div class="row">
+            <mat-checkbox class="col-8 mt-1 ml-4" formControlName="selfSigned">Self-signed
+                certificate</mat-checkbox>
+            <div class="col-3" align="end">
                 <button mat-raised-button color="primary" (click)="chooseTemplate()">Next</button>
             </div>
         </div>

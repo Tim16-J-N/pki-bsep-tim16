@@ -1,18 +1,14 @@
 .dialog-class {
     width: 600px;
-    height: 430px;
+    height: 400px;
 }
   
 .form-full-width {
   width: 100%;
 }
 
-.chk-self-signed {
-  margin-left: 18px;
-}
-
 .cc-selector input{
-  margin:0 7px 0 7px;
+  margin:0;
   padding:0;
   -webkit-appearance:none;
      -moz-appearance:none;
@@ -37,8 +33,8 @@
   background-size:contain;
   background-repeat:no-repeat;
   display:inline-block;
-  width: 180px;
-  height: 180px;
+  width: 160px;
+  height: 160px;
   -webkit-transition: all 100ms ease-in;
      -moz-transition: all 100ms ease-in;
           transition: all 100ms ease-in;
