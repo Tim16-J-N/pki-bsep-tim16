@@ -2,10 +2,10 @@
     <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
         [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
         <mat-toolbar>Menu</mat-toolbar>
-        <mat-nav-list>
-            <a mat-list-item routerLink="/">List certificates</a>
+        <mat-nav-list *ngIf="isLoggedIn()">
+            <a mat-list-item routerLink="/certificates">List certificates</a>
+            <a mat-list-item (click)="logout()">Log out</a>
         </mat-nav-list>
-
     </mat-sidenav>
     <mat-sidenav-content>
         <mat-toolbar color="primary">
@@ -13,7 +13,7 @@
                 *ngIf="isHandset$ | async">
                 <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
             </button>
-            <span>PKI</span>
+            <span>Public Key Infrastructure</span>
         </mat-toolbar>
         <!-- Add Content Here -->
         <router-outlet></router-outlet>
