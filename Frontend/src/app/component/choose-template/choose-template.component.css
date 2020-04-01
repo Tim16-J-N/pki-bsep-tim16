@@ -1,10 +1,14 @@
 .dialog-class {
     width: 600px;
-    height: 410px;;
+    height: 430px;
 }
   
 .form-full-width {
   width: 100%;
+}
+
+.chk-self-signed {
+  margin-left: 18px;
 }
 
 .cc-selector input{

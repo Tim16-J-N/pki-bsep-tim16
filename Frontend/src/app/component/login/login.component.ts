@@ -35,7 +35,6 @@ export class LoginComponent implements OnInit {
 
     this.userService.login(user).subscribe(
       () => {
-        console.log("login page login");
         this.toastr.success("You have successfuly logged in!", 'Login');
         this.redirectToHomePage();
       },

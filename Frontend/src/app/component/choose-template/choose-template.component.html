@@ -14,9 +14,11 @@
             <input id="codeSigning" type="radio" formControlName="template" [value]="codeSigning" />
             <label class="label-cc codeSigning" for="codeSigning"></label>
         </div>
-        <div align="end">
-            <button mat-raised-button color="primary" (click)="chooseTemplate()"
-                [disabled]="!chooseTemplateForm.valid">Next</button>
+        <div>
+            <mat-checkbox class="chk-self-signed" formControlName="selfSigned">Self-signed certificate</mat-checkbox>
+            <div align="end">
+                <button mat-raised-button color="primary" (click)="chooseTemplate()">Next</button>
+            </div>
         </div>
     </form>
 </mat-dialog-content>

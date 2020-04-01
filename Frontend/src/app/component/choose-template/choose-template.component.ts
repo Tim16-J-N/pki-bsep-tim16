@@ -12,6 +12,7 @@ export class ChooseTemplateComponent implements OnInit {
 
   chooseTemplateForm: FormGroup;
   templateSelected: Template;
+  isSelfSigned: boolean;
 
   blank = new Template(false, false, false, false, false, false, false, false, false, false);
   ca = new Template(true, true, true, false, false, true, true, false, false, false);
@@ -24,16 +25,19 @@ export class ChooseTemplateComponent implements OnInit {
     public dialogRef: MatDialogRef<ChooseTemplateComponent>
   ) {
     this.templateSelected = this.blank;
+    this.isSelfSigned = false;
   }
 
   ngOnInit() {
     this.chooseTemplateForm = this.formBuilder.group({
-      template: new FormControl(this.blank, Validators.required)
+      template: new FormControl(this.blank, Validators.required),
+      selfSigned: new FormControl(false, null),
     });
   }
 
   chooseTemplate() {
-    this.templateSelected = this.chooseTemplateForm.value;
+    this.templateSelected = this.chooseTemplateForm.value.template;
+    this.isSelfSigned = this.chooseTemplateForm.value.selfSigned;
     this.dialogRef.close();
   }
 }
