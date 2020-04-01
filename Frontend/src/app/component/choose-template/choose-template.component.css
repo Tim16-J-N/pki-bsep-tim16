@@ -1,0 +1,55 @@
+.dialog-class {
+    width: 600px;
+    height: 410px;;
+}
+  
+.form-full-width {
+  width: 100%;
+}
+
+.cc-selector input{
+  margin:0 7px 0 7px;
+  padding:0;
+  -webkit-appearance:none;
+     -moz-appearance:none;
+          appearance:none;
+}
+
+.blank{background-image:url("../../../assets/images/blank_icon.png");}
+.ca{background-image:url("../../../assets/images/certificate_authority_icon.png");}
+.sslServer{background-image:url("../../../assets/images/ssl_server_icon.png");}
+.sslClient{background-image:url("../../../assets/images/ssl_client_icon.png");}
+.codeSigning{background-image:url("../../../assets/images/code_signing_icon.png");}
+
+.cc-selector input:active +.label-cc{opacity: .9;}
+.cc-selector input:checked +.label-cc{
+  -webkit-filter: none;
+     -moz-filter: none;
+          filter: none;
+}
+
+.label-cc{
+  cursor:pointer;
+  background-size:contain;
+  background-repeat:no-repeat;
+  display:inline-block;
+  width: 180px;
+  height: 180px;
+  -webkit-transition: all 100ms ease-in;
+     -moz-transition: all 100ms ease-in;
+          transition: all 100ms ease-in;
+  -webkit-filter: brightness(1) grayscale(1) opacity(.7);
+     -moz-filter: brightness(1) grayscale(1) opacity(.7);
+          filter: brightness(1) grayscale(1) opacity(.7);
+}
+
+.label-cc:hover{
+  -webkit-filter: brightness(0.9) grayscale(.5) opacity(.9);
+     -moz-filter: brightness(0.9) grayscale(.5) opacity(.9);
+          filter: brightness(0.9) grayscale(.5) opacity(.9);
+}
+
+/* Extras */
+a:visited{color:#888}
+a{color:#444;text-decoration:none;}
+p{margin-bottom:.3em;}

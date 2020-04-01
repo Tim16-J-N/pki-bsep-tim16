@@ -1,0 +1,22 @@
+<h1>Choose template</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="chooseTemplateForm" class="form-full-width">
+        <div class="cc-selector">
+            <input id="blank" type="radio" formControlName="template" [value]="blank" />
+            <label class=" label-cc blank" for="blank"></label>
+            <input id="ca" type="radio" formControlName="template" [value]="ca" />
+            <label class="label-cc ca" for="ca"></label>
+            <input id="sslServer" type="radio" formControlName="template" [value]="sslServer" />
+            <label class="label-cc sslServer" for="sslServer"></label>
+            <br />
+            <input id="sslClient" type="radio" formControlName="template" [value]="sslClient" />
+            <label class="label-cc sslClient" for="sslClient"></label>
+            <input id="codeSigning" type="radio" formControlName="template" [value]="codeSigning" />
+            <label class="label-cc codeSigning" for="codeSigning"></label>
+        </div>
+        <div align="end">
+            <button mat-raised-button color="primary" (click)="chooseTemplate()"
+                [disabled]="!chooseTemplateForm.valid">Next</button>
+        </div>
+    </form>
+</mat-dialog-content>
