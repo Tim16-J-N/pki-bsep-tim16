@@ -402,6 +402,42 @@
                                 </div>
                                 <mat-dialog-actions class="mt-2 mb-1">
                                     <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+                                    <button mat-raised-button color="primary"
+                                        [disabled]="!createCertificateFormOtherData.valid" matStepperNext>Next</button>
+                                </mat-dialog-actions>
+                            </form>
+                        </mat-step>
+                        <mat-step [stepControl]="createCertificateInfoAboutKeyStorage">
+                            <form [formGroup]="createCertificateInfoAboutKeyStorage">
+                                <ng-template matStepLabel>Information for saving certificate</ng-template>
+                                <table class="form-full-width mt-2" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <mat-form-field>
+                                                <input matInput placeholder="Alias" formControlName="alias">
+                                                <mat-error
+                                                    *ngIf="createCertificateInfoAboutKeyStorage.get('alias').errors && createCertificateInfoAboutKeyStorage.get('alias').errors['required']">
+                                                    Please enter alias.
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <mat-form-field>
+                                                <input type="password" matInput formControlName="password"
+                                                    placeholder="Password">
+                                                <mat-error
+                                                    *ngIf="createCertificateInfoAboutKeyStorage.get('password').errors && createCertificateInfoAboutKeyStorage.get('password').errors['required']">
+                                                    Please enter password.
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <mat-dialog-actions class="mt-2 mb-1">
+                                    <button mat-raised-button color="primary" matStepperPrevious>Back</button>
                                     <button mat-raised-button color="primary" (click)="createCertificate()"
                                         [disabled]="!createCertificateFormOtherData.valid" matStepperNext>Next</button>
                                 </mat-dialog-actions>

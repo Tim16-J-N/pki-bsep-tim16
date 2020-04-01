@@ -1,3 +1,4 @@
+import { CreateCertificate } from './../../model/create.certificate';
 import { CertificateService } from './../../service/certificate.service';
 import { Certificate } from './../../model/certificate';
 import { ExtendedKeyUsage } from './../../model/extended.key.usage';
@@ -29,6 +30,8 @@ export class CreateCertificateComponent implements OnInit {
   createCertificateFormSubject: FormGroup;
   createCertificateFormIssuer: FormGroup;
   createCertificateFormOtherData: FormGroup;
+  createCertificateInfoAboutKeyStorage: FormGroup;
+
   minDate = new Date();
   subjects: Entity[] = [];
   issuers: Entity[] = [];
@@ -74,6 +77,10 @@ export class CreateCertificateComponent implements OnInit {
       validator: [TimeValidator]
     });
 
+    this.createCertificateInfoAboutKeyStorage = this.formBuilder.group({
+      alias: new FormControl(null, Validators.required),
+      password: new FormControl(null, Validators.required)
+    });
     this.subjects.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
     this.issuers.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
     this.createdNewSubject = this.subjectService.createSuccessEmitter.subscribe(
@@ -110,12 +117,15 @@ export class CreateCertificateComponent implements OnInit {
       this.createCertificateFormOtherData.value.validFrom, this.createCertificateFormOtherData.value.validTo,
       this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
       this.createCertificateFormOtherData.value.subjectIsCa, keyUsage, extendedKeyUsage);
+    const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
+      this.createCertificateInfoAboutKeyStorage.value.password);
 
-    this.certificateService.add(certificate).subscribe(
+    this.certificateService.add(createCertificate).subscribe(
       () => {
         this.createCertificateFormOtherData.reset();
         this.createCertificateFormSubject.reset();
         this.createCertificateFormIssuer.reset();
+        this.createCertificateInfoAboutKeyStorage.reset();
         this.toastr.success('Successfully created a new certificate.', 'Create certificate');
       },
       () => {
