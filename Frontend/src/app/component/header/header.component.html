@@ -6,6 +6,10 @@
             <a mat-list-item routerLink="/admin/create-certificate">Create certificate</a>
         </mat-nav-list>
 
+        <mat-nav-list *ngIf="isLoggedIn()">
+            <a mat-list-item routerLink="/certificates">List certificates</a>
+            <a mat-list-item (click)="logout()">Log out</a>
+        </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content>
         <mat-toolbar color="primary">
@@ -13,7 +17,7 @@
                 *ngIf="isHandset$ | async">
                 <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
             </button>
-            <span>PKI system</span>
+            <span>Public Key Infrastructure</span>
         </mat-toolbar>
         <!-- Add Content Here -->
         <router-outlet></router-outlet>

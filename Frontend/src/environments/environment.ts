@@ -8,4 +8,5 @@ export const environment = {
   baseUrl: 'http://localhost:8080',
   subject: '/api/subject',
   certificate: '/api/certificate',
+  auth: '/api/auth',
 };

@@ -1,12 +1,43 @@
 import { CreateCertificateComponent } from './component/create-certificate/create-certificate.component';
+import { AdminGuard } from './guard/admin.guard';
+import { ErrorComponent } from './component/error/error.component';
+import { NonAuthorizedErrorPageComponent } from './component/non-authorized-error-page/non-authorized-error-page.component';
+import { NonAuthenticatedErrorPageComponent } from './component/non-authenticated-error-page/non-authenticated-error-page.component';
+import { LoginComponent } from './component/login/login.component';
+import { ListCertificatesComponent } from './component/list-certificates/list-certificates.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
 
+
+  {
+    path: '',
+    component: LoginComponent,
+  },
+  //******************* ADMIN PAGES ************************
+  {
+    path: 'certificates',
+    component: ListCertificatesComponent,
+    canActivate: [AdminGuard],
+  },
   {
     path: 'admin/create-certificate',
     component: CreateCertificateComponent,
+    canActivate: [AdminGuard],
+  },
+  //******************* ERROR PAGES ************************
+  {
+    path: 'error/non-authenticated',
+    component: NonAuthenticatedErrorPageComponent,
+  },
+  {
+    path: 'error/non-authorized',
+    component: NonAuthorizedErrorPageComponent,
+  },
+  {
+    path: '**',
+    component: ErrorComponent,
   }
 ];
 
