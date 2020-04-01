@@ -1,0 +1,44 @@
+.card-section { 
+    position: relative; 
+    bottom: 60px; 
+}
+
+.card-block { 
+    padding: 40px; 
+    width: 50%;    
+    margin: auto; 
+}
+
+.subject-card {
+    max-width: 500px;
+}
+  
+.issuer-card {
+    max-width: 500px;
+}
+  
+.form-full-width {
+    width: 100%;
+}
+
+.page-title { 
+    font-size: 15px; 
+    line-height: 1;
+  
+}
+.first {
+    width: 35%
+  }
+
+  
+.table-font {
+    font-size: 115%;
+    margin-bottom: 15px;
+  }
+  .form-full-width-td {
+    width: 100%;
+  }
+  .mat-dialog-actions {
+    justify-content: flex-end;
+  }
+  

@@ -1,0 +1,415 @@
+<div class="card-section">
+    <div class="container">
+        <div class="card-block bg-white mb30">
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <h1>Create certificate</h1>
+                    <mat-horizontal-stepper [linear]="true" #stepper>
+                        <mat-step [stepControl]="createCertificateFormSubject">
+                            <div class="text-center mt-4">
+                                <button mat-raised-button color="primary" (click)="openAddSubject()">Add
+                                    subject</button>
+                            </div>
+                            <form [formGroup]="createCertificateFormSubject">
+                                <ng-template matStepLabel>Choose subject</ng-template>
+                                <mat-form-field class="form-full-width mt-2">
+                                    <mat-label>Choose</mat-label>
+                                    <mat-select formControlName="selectedSubject">
+                                        <mat-option *ngFor="let subject of subjects" [value]="subject">
+                                            {{subject.commonName}} + {{subject.organization}} +
+                                            {{subject.countryCode}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="getSelectedSubject()">
+                                    <mat-card class="subject-card">
+                                        <mat-card-header>
+                                            <mat-card-title class="page-title">Selected subject</mat-card-title>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <div *ngIf="getSelectedSubject().type == 'user'">
+
+                                                <table class="form-full-width table-font" cellspacing="0">
+                                                    <tr>
+                                                        <td class="first">Common name</td>
+                                                        <td>{{getSelectedSubject().commonName}}</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td class="first">Email</td>
+                                                        <td>{{getSelectedSubject().email}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Surname</td>
+                                                        <td>{{getSelectedSubject().surname}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Givename</td>
+                                                        <td>{{getSelectedSubject().givename}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Organization</td>
+                                                        <td>{{getSelectedSubject().organization}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Country code</td>
+                                                        <td>{{getSelectedSubject().countryCode}}</td>
+                                                    </tr>
+                                                </table>
+
+                                            </div>
+                                            <div *ngIf="getSelectedSubject().type == 'software'">
+
+                                                <table class="form-full-width table-font" cellspacing="0">
+                                                    <tr>
+                                                        <td class="first">Common name</td>
+                                                        <td>{{getSelectedSubject().commonName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Organization</td>
+                                                        <td>{{getSelectedSubject().organization}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Organization unit name</td>
+                                                        <td>{{getSelectedSubject().organizationUnitName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Country code</td>
+                                                        <td>{{getSelectedSubject().countryCode}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Locality name</td>
+                                                        <td>{{getSelectedSubject().localityName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">State, or province name </td>
+                                                        <td>{{getSelectedSubject().state}}</td>
+                                                    </tr>
+
+                                                </table>
+
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <div>
+                                    <button mat-raised-button color="primary"
+                                        [disabled]="!createCertificateFormSubject.valid" matStepperNext>Next</button>
+                                </div>
+                            </form>
+                        </mat-step>
+                        <mat-step [stepControl]="createCertificateFormIssuer">
+
+                            <form [formGroup]="createCertificateFormIssuer">
+                                <ng-template matStepLabel>Choose issuer</ng-template>
+                                <mat-form-field class="form-full-width mt-2">
+                                    <mat-label>Choose</mat-label>
+                                    <mat-select formControlName="selectedIssuer">
+                                        <mat-option *ngFor="let issuer of issuers" [value]="issuer">
+                                            {{issuer.commonName}} + {{issuer.organization}} +
+                                            {{issuer.countryCode}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="getSelectedIssuer()">
+                                    <mat-card class="subject-card">
+                                        <mat-card-header>
+                                            <mat-card-title class="page-title">Selected subject</mat-card-title>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <div *ngIf="getSelectedIssuer().type == 'user'">
+
+                                                <table class="form-full-width table-font" cellspacing="0">
+                                                    <tr>
+                                                        <td class="first">Common name</td>
+                                                        <td>{{getSelectedIssuer().commonName}}</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td class="first">Email</td>
+                                                        <td>{{getSelectedIssuer().email}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Surname</td>
+                                                        <td>{{getSelectedIssuer().surname}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Givename</td>
+                                                        <td>{{getSelectedIssuer().givename}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Organization</td>
+                                                        <td>{{getSelectedIssuer().organization}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Country code</td>
+                                                        <td>{{getSelectedIssuer().countryCode}}</td>
+                                                    </tr>
+                                                </table>
+
+                                            </div>
+                                            <div *ngIf="getSelectedIssuer().type == 'software'">
+
+                                                <table class="form-full-width table-font" cellspacing="0">
+                                                    <tr>
+                                                        <td class="first">Common name</td>
+                                                        <td>{{getSelectedIssuer().commonName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Organization</td>
+                                                        <td>{{getSelectedIssuer().organization}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Organization unit name</td>
+                                                        <td>{{getSelectedIssuer().organizationUnitName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Country code</td>
+                                                        <td>{{getSelectedIssuer().countryCode}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">Locality name</td>
+                                                        <td>{{getSelectedIssuer().localityName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="first">State, or province name </td>
+                                                        <td>{{getSelectedIssuer().state}}</td>
+                                                    </tr>
+
+                                                </table>
+
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <mat-dialog-actions class="mt-2 mb-1">
+                                    <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+                                    <button mat-raised-button color="primary"
+                                        [disabled]="!createCertificateFormIssuer.valid" matStepperNext>Next</button>
+                                </mat-dialog-actions>
+                            </form>
+                        </mat-step>
+
+                        <mat-step [stepControl]="createCertificateFormOtherData">
+
+                            <form [formGroup]="createCertificateFormOtherData">
+                                <ng-template matStepLabel>Set validation period</ng-template>
+                                <table class="form-full-width mt-2" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <mat-form-field>
+                                                <input matInput [matDatepicker]="pickerFrom" placeholder="Valid from"
+                                                    formControlName="validFrom" readonly [min]="minDate">
+                                                <mat-datepicker-toggle matSuffix [for]="pickerFrom">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #pickerFrom disabled="false"></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input matInput [matDatepicker]="pickerTo" placeholder="Valid to"
+                                                    formControlName="validTo" readonly [min]="minDate">
+                                                <mat-datepicker-toggle matSuffix [for]="pickerTo">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #pickerTo disabled="false"></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <mat-error class="work-hours"
+                                    *ngIf="(createCertificateFormOtherData.get('validFrom').errors && createCertificateFormOtherData.get('validFrom').errors['required']) || 
+                (createCertificateFormOtherData.get('validTo').errors && createCertificateFormOtherData.get('validTo').errors['required']) ">
+                                    Please choose start and end date
+                                </mat-error>
+                                <mat-error class="work-hours"
+                                    *ngIf="createCertificateFormOtherData.errors && createCertificateFormOtherData.errors['validError']">
+                                    Start time must be before end time.
+                                </mat-error>
+                                <div>
+                                    <h1>Manage extensions</h1>
+                                    <table class="form-full-width table-font" cellspacing="0">
+                                        <tr>
+                                            <td><label>Subject is CA :</label></td>
+                                            <td>
+                                                <mat-radio-group aria-labelledby="kind-radio-group"
+                                                    class="form-full-width-td" formControlName="subjectIsCa">
+                                                    <mat-radio-button class="ml-4" value="true">Yes
+                                                    </mat-radio-button>
+                                                    <mat-radio-button class="ml-4" value="false" checked="checked">No
+                                                    </mat-radio-button>
+                                                </mat-radio-group>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><label>Use extension "Authority Key identifier" :</label></td>
+                                            <td>
+                                                <mat-radio-group aria-labelledby="kind-radio-group"
+                                                    class="form-full-width-td" formControlName="authorityKeyIdentifier">
+                                                    <mat-radio-button class="ml-4" value="true">Yes
+                                                    </mat-radio-button>
+                                                    <mat-radio-button class="ml-4" value="false" checked="checked">No
+                                                    </mat-radio-button>
+                                                </mat-radio-group>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><label>Use extension "Subject Key identifier" :</label></td>
+                                            <td>
+                                                <mat-radio-group aria-labelledby="kind-radio-group"
+                                                    class="form-full-width-td" formControlName="subjectKeyIdentifier">
+                                                    <mat-radio-button class="ml-4" value="true">Yes
+                                                    </mat-radio-button>
+                                                    <mat-radio-button class="ml-4" value="false" checked="checked">No
+                                                    </mat-radio-button>
+                                                </mat-radio-group>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <mat-accordion class="example-headers-align">
+                                        <mat-expansion-panel [expanded]="step === 0" hideToggle>
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    Key usage
+                                                </mat-panel-title>
+                                                <mat-panel-description>
+                                                    Change this extension
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+                                            <table class="form-full-width table-font" cellspacing="0"
+                                                formGroupName="keyUsage">
+                                                <tr>
+                                                    <td>
+                                                        <mat-checkbox formControlName="digitalSignature">Digital
+                                                            signature</mat-checkbox>
+
+                                                    </td>
+                                                    <td>
+
+                                                        <mat-checkbox formControlName="nonRepudiation">
+                                                            Non Repudiation
+                                                        </mat-checkbox>
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <mat-checkbox formControlName="keyEncipherment"> Key
+                                                            Encipherment
+                                                        </mat-checkbox>
+                                                    </td>
+                                                    <td>
+                                                        <mat-checkbox formControlName="dataEncipherment">
+                                                            Data Encipherment</mat-checkbox>
+
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <mat-checkbox formControlName="keyAgreement"> Key Agreement
+                                                        </mat-checkbox>
+                                                    </td>
+                                                    <td>
+                                                        <mat-checkbox formControlName="certificateSigning">Certificate
+                                                            Signing</mat-checkbox>
+
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+
+
+                                                    <td>
+                                                        <mat-checkbox formControlName="crlSign">
+                                                            CRL Sign</mat-checkbox>
+                                                    </td>
+                                                    <td>
+                                                        <mat-checkbox formControlName="enchiperOnly">Enchiper Only
+                                                        </mat-checkbox>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+
+                                                    <td>
+                                                        <mat-checkbox formControlName="decipherOnly">
+                                                            Decipher Only</mat-checkbox>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </mat-expansion-panel>
+
+                                    </mat-accordion>
+
+
+                                    <mat-accordion class="example-headers-align">
+                                        <mat-expansion-panel [expanded]="step === 0" hideToggle>
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    Extended Key usage
+                                                </mat-panel-title>
+                                                <mat-panel-description>
+                                                    Change this extension
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+                                            <table class="form-full-width table-font" cellspacing="0"
+                                                formGroupName="extentendedKeyUsage">
+                                                <tr>
+                                                    <td>
+                                                        <mat-checkbox formControlName="serverAuth"> TLS Web server
+                                                            authentication</mat-checkbox>
+
+                                                    </td>
+                                                    <td>
+                                                        <mat-checkbox formControlName="codeSigning"> Code signing
+                                                        </mat-checkbox>
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+
+                                                    <td>
+
+                                                        <mat-checkbox formControlName="clientAuth">
+                                                            TLS Web client authentication
+                                                        </mat-checkbox>
+                                                    </td>
+                                                    <td>
+                                                        <mat-checkbox formControlName="emailProtection">
+                                                            E-mail protection</mat-checkbox>
+
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <mat-checkbox formControlName="timeStamping">TimeStamping
+                                                        </mat-checkbox>
+                                                    </td>
+                                                    <td>
+                                                        <mat-checkbox formControlName="ocspSigning"> OCSP Signing
+                                                        </mat-checkbox>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            </table>
+                                        </mat-expansion-panel>
+
+                                    </mat-accordion>
+                                </div>
+                                <mat-dialog-actions class="mt-2 mb-1">
+                                    <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+                                    <button mat-raised-button color="primary" (click)="createCertificate()"
+                                        [disabled]="!createCertificateFormOtherData.valid" matStepperNext>Next</button>
+                                </mat-dialog-actions>
+                            </form>
+                        </mat-step>
+                    </mat-horizontal-stepper>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

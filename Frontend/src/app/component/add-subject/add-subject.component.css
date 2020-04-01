@@ -1,0 +1,20 @@
+.dialog-class {
+    width: 500px;
+}
+  
+.form-full-width {
+  width: 100%;
+}
+
+.form-full-width-td {
+  width: 98%;
+}
+
+.mat-dialog-actions {
+    justify-content: flex-end;
+}
+
+textarea {
+    resize: vertical;
+}
+
