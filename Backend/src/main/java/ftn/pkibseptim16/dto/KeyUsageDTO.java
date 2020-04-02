@@ -1,5 +1,7 @@
 package ftn.pkibseptim16.dto;
 
+import org.bouncycastle.asn1.x509.KeyUsage;
+
 import javax.validation.constraints.NotNull;
 
 public class KeyUsageDTO {
@@ -30,11 +32,16 @@ public class KeyUsageDTO {
     @NotNull
     private Boolean nonRepudiation;
 
-    public KeyUsageDTO(){
+    public KeyUsageDTO() {
 
     }
+
     public Boolean getCertificateSigning() {
         return certificateSigning;
+    }
+
+    public int getCertificateSigningInt() {
+        return certificateSigning ? KeyUsage.keyCertSign : 0;
     }
 
     public void setCertificateSigning(Boolean certificateSigning) {
@@ -45,12 +52,20 @@ public class KeyUsageDTO {
         return crlSign;
     }
 
+    public int getCrlSignInt() {
+        return crlSign ? KeyUsage.cRLSign : 0;
+    }
+
     public void setCrlSign(Boolean crlSign) {
         this.crlSign = crlSign;
     }
 
     public Boolean getDataEncipherment() {
         return dataEncipherment;
+    }
+
+    public int getDataEnciphermentInt() {
+        return dataEncipherment ? KeyUsage.dataEncipherment : 0;
     }
 
     public void setDataEncipherment(Boolean dataEncipherment) {
@@ -61,12 +76,20 @@ public class KeyUsageDTO {
         return decipherOnly;
     }
 
+    public int getDecipherOnlyInt() {
+        return decipherOnly ? KeyUsage.decipherOnly : 0;
+    }
+
     public void setDecipherOnly(Boolean decipherOnly) {
         this.decipherOnly = decipherOnly;
     }
 
     public Boolean getDigitalSignature() {
         return digitalSignature;
+    }
+
+    public int getDigitalSignatureInt() {
+        return digitalSignature ? KeyUsage.digitalSignature : 0;
     }
 
     public void setDigitalSignature(Boolean digitalSignature) {
@@ -77,12 +100,20 @@ public class KeyUsageDTO {
         return enchiperOnly;
     }
 
+    public int getEnchiperOnlyInt() {
+        return enchiperOnly ? KeyUsage.encipherOnly : 0;
+    }
+
     public void setEnchiperOnly(Boolean enchiperOnly) {
         this.enchiperOnly = enchiperOnly;
     }
 
     public Boolean getKeyAgreement() {
         return keyAgreement;
+    }
+
+    public int getKeyAgreementInt() {
+        return keyAgreement ? KeyUsage.keyAgreement : 0;
     }
 
     public void setKeyAgreement(Boolean keyAgreement) {
@@ -93,6 +124,10 @@ public class KeyUsageDTO {
         return keyEncipherment;
     }
 
+    public int getKeyEnciphermentInt() {
+        return keyEncipherment ? KeyUsage.keyEncipherment : 0;
+    }
+
     public void setKeyEncipherment(Boolean keyEncipherment) {
         this.keyEncipherment = keyEncipherment;
     }
@@ -101,11 +136,15 @@ public class KeyUsageDTO {
         return nonRepudiation;
     }
 
+    public int getNonRepudiationInt() {
+        return nonRepudiation ? KeyUsage.nonRepudiation : 0;
+    }
+
     public void setNonRepudiation(Boolean nonRepudiation) {
         this.nonRepudiation = nonRepudiation;
     }
 
-    public boolean isEnabled(){
+    public boolean isEnabled() {
         return certificateSigning || crlSign || dataEncipherment || decipherOnly || digitalSignature || enchiperOnly ||
                 keyAgreement || keyEncipherment || nonRepudiation;
     }

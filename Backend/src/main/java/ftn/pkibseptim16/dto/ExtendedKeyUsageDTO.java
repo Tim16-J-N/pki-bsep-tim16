@@ -1,6 +1,9 @@
 package ftn.pkibseptim16.dto;
 
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 
 public class ExtendedKeyUsageDTO {
     @NotNull
@@ -21,9 +24,10 @@ public class ExtendedKeyUsageDTO {
     @NotNull
     private Boolean ocspSigning;
 
-    public ExtendedKeyUsageDTO(){
+    public ExtendedKeyUsageDTO() {
 
     }
+
     public Boolean getServerAuth() {
         return serverAuth;
     }
@@ -70,5 +74,25 @@ public class ExtendedKeyUsageDTO {
 
     public void setOcspSigning(Boolean ocspSigning) {
         this.ocspSigning = ocspSigning;
+    }
+
+    public boolean isEnabled() {
+        return serverAuth || clientAuth || codeSigning || emailProtection || timeStamping || ocspSigning;
+    }
+
+    public KeyPurposeId[] getKeyPurposeIds() {
+        Boolean[] booleans = {serverAuth, clientAuth, codeSigning, emailProtection, timeStamping, ocspSigning};
+        KeyPurposeId[] keyPurposeIds = {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_codeSigning,
+                KeyPurposeId.id_kp_emailProtection, KeyPurposeId.id_kp_timeStamping, KeyPurposeId.id_kp_OCSPSigning};
+
+        ArrayList<KeyPurposeId> setPurposes = new ArrayList<>();
+
+        for (int i = 0; i < booleans.length; i++) {
+            if (booleans[i]) {
+                setPurposes.add(keyPurposeIds[i]);
+            }
+        }
+
+        return (KeyPurposeId[]) setPurposes.toArray();
     }
 }
