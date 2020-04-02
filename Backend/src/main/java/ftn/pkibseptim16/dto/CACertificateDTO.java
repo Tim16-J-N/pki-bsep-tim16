@@ -3,25 +3,20 @@ package ftn.pkibseptim16.dto;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.security.PublicKey;
 
-public class CertificateDTO {
-
+public class CACertificateDTO {
+    @NotNull
     private BigInteger serialNumber;
 
     @NotNull
-    private EntityDTO subject;
-
-    @NotNull
-    private CACertificateDTO issuerCertificate;
+    private Long issuerUniqueId;
 
     @NotNull
     private Boolean authorityKeyIdentifier;
 
     @NotNull
     private Boolean subjectKeyIdentifier;
-
-    @NotNull
-    private Boolean subjectIsCa;
 
     @NotEmpty(message = "Valid from is empty.")
     private String validFrom;
@@ -35,9 +30,9 @@ public class CertificateDTO {
     @NotNull
     private ExtendedKeyUsageDTO extendedKeyUsage;
 
-    public CertificateDTO(){
+    @NotNull
+    private String alias;
 
-    }
     public BigInteger getSerialNumber() {
         return serialNumber;
     }
@@ -46,20 +41,20 @@ public class CertificateDTO {
         this.serialNumber = serialNumber;
     }
 
-    public EntityDTO getSubject() {
-        return subject;
+    public String getAlias() {
+        return alias;
     }
 
-    public void setSubject(EntityDTO subject) {
-        this.subject = subject;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
-    public CACertificateDTO getIssuerCertificate() {
-        return issuerCertificate;
+    public Long getIssuerUniqueId() {
+        return issuerUniqueId;
     }
 
-    public void setIssuerCertificate(CACertificateDTO issuerCertificate) {
-        this.issuerCertificate = issuerCertificate;
+    public void setIssuerUniqueId(Long issuerUniqueId) {
+        this.issuerUniqueId = issuerUniqueId;
     }
 
     public Boolean getAuthorityKeyIdentifier() {
@@ -76,14 +71,6 @@ public class CertificateDTO {
 
     public void setSubjectKeyIdentifier(Boolean subjectKeyIdentifier) {
         this.subjectKeyIdentifier = subjectKeyIdentifier;
-    }
-
-    public Boolean getSubjectIsCa() {
-        return subjectIsCa;
-    }
-
-    public void setSubjectIsCa(Boolean subjectIsCa) {
-        this.subjectIsCa = subjectIsCa;
     }
 
     public String getValidFrom() {

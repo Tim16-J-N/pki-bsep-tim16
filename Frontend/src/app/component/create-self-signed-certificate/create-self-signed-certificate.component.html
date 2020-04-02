@@ -122,11 +122,12 @@
                     <mat-error class="date-err"
                         *ngIf="(createCertificateFormOtherData.get('validFrom').errors && createCertificateFormOtherData.get('validFrom').errors['required']) || 
                 (createCertificateFormOtherData.get('validTo').errors && createCertificateFormOtherData.get('validTo').errors['required']) ">
-                        Please choose start and end date
+                        Please choose start and end date of validity period
                     </mat-error>
                     <mat-error class="date-err"
                         *ngIf="createCertificateFormOtherData.errors && createCertificateFormOtherData.errors['validError']">
-                        Start date must be before end date
+                        Start date of the validity period must be at least the present day and and must be before end
+                        date
                     </mat-error>
                     <div>
                         <h4>Extensions</h4>

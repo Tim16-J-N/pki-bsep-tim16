@@ -2,28 +2,22 @@ package ftn.pkibseptim16.model;
 
 
 import org.bouncycastle.asn1.x500.X500Name;
-
 import java.security.PublicKey;
-import java.util.Date;
 
 public class SubjectData {
 
     private PublicKey publicKey;
     private X500Name x500name;
-    private String serialNumber;
-    private Date startDate;
-    private Date endDate;
+    private Long id;
 
     public SubjectData() {
 
     }
 
-    public SubjectData(PublicKey publicKey, X500Name x500name, String serialNumber, Date startDate, Date endDate) {
+    public SubjectData(PublicKey publicKey, X500Name x500name,Long id) {
         this.publicKey = publicKey;
         this.x500name = x500name;
-        this.serialNumber = serialNumber;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.id=id;
     }
 
     public X500Name getX500name() {
@@ -42,27 +36,11 @@ public class SubjectData {
         this.publicKey = publicKey;
     }
 
-    public String getSerialNumber() {
-        return serialNumber;
+    public Long getId() {
+        return id;
     }
 
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setId(Long id) {
+        this.id = id;
     }
 }

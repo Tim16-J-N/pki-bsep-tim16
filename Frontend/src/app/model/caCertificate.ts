@@ -1,30 +1,28 @@
 import { ExtendedKeyUsage } from './extended.key.usage';
 import { KeyUsage } from './key.usage';
-import { Entity } from './entity';
+
 import { DateTime } from 'luxon';
-import { CACertificate } from './caCertificate';
-export class Certificate {
+export class CACertificate {
     serialNumber: number;
-    subject: Entity;
-    issuerCertificate: CACertificate;
+    issuerUniqueId: number;
     validFrom: DateTime;
     validTo: DateTime;
     authorityKeyIdentifier: boolean;
     subjectKeyIdentifier: boolean;
-    subjectIsCa: boolean;
     keyUsage: KeyUsage;
     extendedKeyUsage: ExtendedKeyUsage;
-    constructor(subject: Entity, issuerCertificate: CACertificate, validFrom: DateTime, validTo: DateTime, authorityKeyIdentifier: boolean,
-        subjectKeyIdentifier: boolean, subjectIsCa: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, serialNumber?: number) {
-        this.subject = subject;
-        this.issuerCertificate = issuerCertificate;
+    alias: string;
+
+    constructor(issuerUniqueId: number, validFrom: DateTime, validTo: DateTime, authorityKeyIdentifier: boolean,
+        subjectKeyIdentifier: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, alias: string, serialNumber: number, publicKey: string) {
+        this.issuerUniqueId = issuerUniqueId;
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.authorityKeyIdentifier = authorityKeyIdentifier;
         this.subjectKeyIdentifier = subjectKeyIdentifier;
-        this.subjectIsCa = subjectIsCa;
         this.serialNumber = serialNumber;
         this.keyUsage = keyUsage;
         this.extendedKeyUsage = extendedKeyUsage;
+        this.alias = alias;
     }
 }

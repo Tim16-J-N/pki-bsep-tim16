@@ -29,7 +29,7 @@ public class CertificateController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>(createdCertificate, HttpStatus.CREATED);
-        } catch (DateTimeParseException ex) {
+        } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

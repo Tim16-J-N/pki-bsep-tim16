@@ -82,7 +82,7 @@ export class AddSubjectComponent implements OnInit {
         this.subjectService.createSuccessEmitter.next(subject);
       },
       () => {
-        this.toastr.error('Subject with same email already exist.', 'Create subject');
+        this.toastr.error('Subject with same email or common name already exist.', 'Create subject');
       }
     );
   }

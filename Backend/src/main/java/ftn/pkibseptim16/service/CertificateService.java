@@ -4,5 +4,5 @@ import ftn.pkibseptim16.dto.CertificateDTO;
 import ftn.pkibseptim16.dto.CreateCertificateDTO;
 
 public interface CertificateService {
-     CertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO);
+     CertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws Exception;
 }

@@ -12,6 +12,7 @@ import { Entity } from './../../model/entity';
 import { ValidatorFn, FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { formatDate } from '@angular/common';
 
 const TimeValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('validFrom').value;
@@ -117,9 +118,11 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
     const keyUsage = this.createKeyUsage();
     const extendedKeyUsage = this.createExtendedKeyUsage();
 
+    const validFrom = formatDate(this.createCertificateFormOtherData.value.validFrom, 'yyyy-MM-dd', 'en-US')
+    const validTo = formatDate(this.createCertificateFormOtherData.value.validTo, 'yyyy-MM-dd', 'en-US')
+
     const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormSubject.value.selectedSubject,
-      this.createCertificateFormOtherData.value.validFrom, this.createCertificateFormOtherData.value.validTo,
-      this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
+      validFrom, validTo, this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
       true, keyUsage, extendedKeyUsage);
     const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
       this.createCertificateInfoAboutKeyStorage.value.password);

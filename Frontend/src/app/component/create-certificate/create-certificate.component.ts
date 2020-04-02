@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Entity } from 'src/app/model/entity';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { formatDate } from '@angular/common';
 
 const TimeValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('validFrom').value;
@@ -131,10 +132,11 @@ export class CreateCertificateComponent implements OnInit {
 
     const keyUsage = this.createKeyUsage();
     const extendedKeyUsage = this.createExtendedKeyUsage();
+    const validFrom = formatDate(this.createCertificateFormOtherData.value.validFrom, 'yyyy-MM-dd', 'en-US')
+    const validTo = formatDate(this.createCertificateFormOtherData.value.validTo, 'yyyy-MM-dd', 'en-US')
 
     const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormIssuer.value.selectedIssuer,
-      this.createCertificateFormOtherData.value.validFrom, this.createCertificateFormOtherData.value.validTo,
-      this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
+      validFrom, validTo, this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
       this.createCertificateFormOtherData.value.subjectIsCa, keyUsage, extendedKeyUsage);
     const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
       this.createCertificateInfoAboutKeyStorage.value.password);

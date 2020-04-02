@@ -104,4 +104,9 @@ public class KeyUsageDTO {
     public void setNonRepudiation(Boolean nonRepudiation) {
         this.nonRepudiation = nonRepudiation;
     }
+
+    public boolean isEnabled(){
+        return certificateSigning || crlSign || dataEncipherment || decipherOnly || digitalSignature || enchiperOnly ||
+                keyAgreement || keyEncipherment || nonRepudiation;
+    }
 }
