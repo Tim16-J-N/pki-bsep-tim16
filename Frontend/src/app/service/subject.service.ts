@@ -9,13 +9,13 @@ import { Subject } from 'rxjs';
     providedIn: 'root'
 })
 export class SubjectService {
-    url = environment.baseUrl + environment.subject;
+    url = environment.baseUrl + environment.entity;
     createSuccessEmitter = new Subject<Entity>();
 
     constructor(private httpClient: HttpClient, private router: Router) { }
 
     public add(subject: Entity) {
-        return this.httpClient.post(this.url, subject);
+        return this.httpClient.post(this.url + "/create-subject", subject);
     }
 
 

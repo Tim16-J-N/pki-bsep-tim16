@@ -4,6 +4,7 @@ import ftn.pkibseptim16.security.TokenUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -37,15 +38,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             username = tokenUtils.getUsernameFromToken(authToken);
 
             if (username != null) {
-                // uzmi user-a na osnovu username-a
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                // proveri da li je prosledjeni token validan
-                if (tokenUtils.validateToken(authToken, userDetails)) {
-                    // kreiraj autentifikaciju
-                    TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
-                    authentication.setToken(authToken);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                UserDetails userDetails;
+                try {
+                    userDetails = userDetailsService.loadUserByUsername(username);
+                    if (tokenUtils.validateToken(authToken, userDetails)) {
+                        TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
+                        authentication.setToken(authToken);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                } catch (UsernameNotFoundException e) {
                 }
             }
         }

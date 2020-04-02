@@ -41,6 +41,17 @@ export class ChooseTemplateComponent implements OnInit {
     this.templateSelected = this.chooseTemplateForm.value.template;
     this.isSelfSigned = this.chooseTemplateForm.value.selfSigned;
     this.dialogRef.close();
-    this.router.navigate(['/admin/create-certificate']);
+
+    if (JSON.parse(localStorage.getItem('selectedTemplate'))) {
+      localStorage.removeItem('selectedTemplate');
+    }
+    localStorage.setItem('selectedTemplate', JSON.stringify(this.templateSelected));
+
+    if (this.isSelfSigned) {
+      this.router.navigate(['/admin/create-self-signed-certificate']);
+    } else {
+      this.router.navigate(['/admin/create-certificate']);
+    }
+
   }
 }

@@ -10,6 +10,7 @@ export class KeyUsage {
     keyAgreement: boolean;
     keyEncipherment: boolean;
     nonRepudiation: boolean;
+
     constructor(certificateSigning: boolean, crlSign: boolean, dataEncipherment: boolean, decipherOnly: boolean, digitalSignature: boolean,
         enchiperOnly: boolean, keyAgreement: boolean, keyEncipherment: boolean, nonRepudiation: boolean, ) {
         this.certificateSigning = certificateSigning;

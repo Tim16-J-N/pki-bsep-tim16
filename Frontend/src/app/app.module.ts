@@ -20,6 +20,7 @@ import { LoginComponent } from './component/login/login.component';
 import { TokenInterceptor } from './interseptor/token.interceptor';
 import { ErrorInterceptor } from './interseptor/error.interceptor';
 import { ChooseTemplateComponent } from './component/choose-template/choose-template.component';
+import { CreateSelfSignedCertificateComponent } from './component/create-self-signed-certificate/create-self-signed-certificate.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { ChooseTemplateComponent } from './component/choose-template/choose-temp
     NonAuthorizedErrorPageComponent,
     ErrorComponent,
     ChooseTemplateComponent,
+    CreateSelfSignedCertificateComponent,
   ],
   imports: [
     BrowserModule,

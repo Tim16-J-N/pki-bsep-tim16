@@ -1,16 +1,16 @@
-import { Template } from './../../model/template';
-import { CreateCertificate } from './../../model/create.certificate';
-import { CertificateService } from './../../service/certificate.service';
-import { Certificate } from './../../model/certificate';
+import { AddSubjectComponent } from './../add-subject/add-subject.component';
 import { ExtendedKeyUsage } from './../../model/extended.key.usage';
 import { KeyUsage } from './../../model/key.usage';
+import { CreateCertificate } from './../../model/create.certificate';
+import { Certificate } from './../../model/certificate';
+import { CertificateService } from './../../service/certificate.service';
 import { SubjectService } from './../../service/subject.service';
-import { AddSubjectComponent } from './../add-subject/add-subject.component';
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, Validators, ValidatorFn } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { Entity } from 'src/app/model/entity';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+import { Template } from './../../model/template';
+import { Entity } from './../../model/entity';
+import { ValidatorFn, FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 const TimeValidator: ValidatorFn = (fg: FormGroup) => {
@@ -23,19 +23,17 @@ const TimeValidator: ValidatorFn = (fg: FormGroup) => {
 };
 
 @Component({
-  selector: 'app-create-certificate',
-  templateUrl: './create-certificate.component.html',
-  styleUrls: ['./create-certificate.component.css']
+  selector: 'app-create-self-signed-certificate',
+  templateUrl: './create-self-signed-certificate.component.html',
+  styleUrls: ['./create-self-signed-certificate.component.css']
 })
-export class CreateCertificateComponent implements OnInit {
+export class CreateSelfSignedCertificateComponent implements OnInit {
   createCertificateFormSubject: FormGroup;
-  createCertificateFormIssuer: FormGroup;
   createCertificateFormOtherData: FormGroup;
   createCertificateInfoAboutKeyStorage: FormGroup;
   minDate = new Date();
   subjects: Entity[] = [];
-  //ovo ces morati da promenis posto on fakticki bira sertifikate a ne issuer-a. Vidi kako i sta ces slati sve ovde na frontend
-  issuers: Entity[] = [];
+
   createdNewSubject: Subscription;
   selectedTemplate: Template;
 
@@ -45,10 +43,6 @@ export class CreateCertificateComponent implements OnInit {
   ngOnInit() {
     this.createCertificateFormSubject = this.formBuilder.group({
       selectedSubject: new FormControl(null, Validators.required),
-    });
-
-    this.createCertificateFormIssuer = this.formBuilder.group({
-      selectedIssuer: new FormControl(null, Validators.required),
     });
 
     this.functionForCreatingFormCertificateFormOtherData();
@@ -74,8 +68,6 @@ export class CreateCertificateComponent implements OnInit {
       password: new FormControl(null, Validators.required)
     });
     this.subjects.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
-    this.issuers.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
-
   }
 
   functionForCreatingFormCertificateFormOtherData() {
@@ -84,7 +76,6 @@ export class CreateCertificateComponent implements OnInit {
       validTo: new FormControl(null, Validators.required),
       authorityKeyIdentifier: new FormControl(false, Validators.required),
       subjectKeyIdentifier: new FormControl(false, Validators.required),
-      subjectIsCa: new FormControl(false, Validators.required),
       keyUsage: this.formBuilder.group({
         certificateSigning: new FormControl(false),
         crlSign: new FormControl(false),
@@ -108,20 +99,14 @@ export class CreateCertificateComponent implements OnInit {
       validator: [TimeValidator]
     });
   }
+
   getSelectedSubject() {
     return this.createCertificateFormSubject.get('selectedSubject').value;
   }
 
-  getSelectedIssuer() {
-    return this.createCertificateFormIssuer.get('selectedIssuer').value;
-  }
   createCertificate() {
     if (this.createCertificateFormSubject.invalid) {
       this.toastr.error("Please choose subject", 'Create certificate');
-      return;
-    }
-    if (this.createCertificateFormIssuer.invalid) {
-      this.toastr.error("Please choose issuer", 'Create certificate');
       return;
     }
     if (this.createCertificateFormOtherData.invalid) {
@@ -132,18 +117,17 @@ export class CreateCertificateComponent implements OnInit {
     const keyUsage = this.createKeyUsage();
     const extendedKeyUsage = this.createExtendedKeyUsage();
 
-    const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormIssuer.value.selectedIssuer,
+    const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormSubject.value.selectedSubject,
       this.createCertificateFormOtherData.value.validFrom, this.createCertificateFormOtherData.value.validTo,
       this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
-      this.createCertificateFormOtherData.value.subjectIsCa, keyUsage, extendedKeyUsage);
+      true, keyUsage, extendedKeyUsage);
     const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
       this.createCertificateInfoAboutKeyStorage.value.password);
 
-    this.certificateService.add(createCertificate).subscribe(
+    this.certificateService.addSelfSigned(createCertificate).subscribe(
       () => {
         this.createCertificateFormOtherData.reset();
         this.createCertificateFormSubject.reset();
-        this.createCertificateFormIssuer.reset();
         this.createCertificateInfoAboutKeyStorage.reset();
         this.toastr.success('Successfully created a new certificate.', 'Create certificate');
       },
@@ -182,7 +166,6 @@ export class CreateCertificateComponent implements OnInit {
       {
         'authorityKeyIdentifier': this.selectedTemplate.authorityKeyId,
         'subjectKeyIdentifier': this.selectedTemplate.subjectKeyId,
-        'subjectIsCa': this.selectedTemplate.CA,
         'keyUsage': {
           'digitalSignature': this.selectedTemplate.digitalSigniture,
           'keyEncipherment': this.selectedTemplate.keyEncipherment,
@@ -197,6 +180,7 @@ export class CreateCertificateComponent implements OnInit {
       }
     );
   }
+
   openAddSubject() {
     this.dialog.open(AddSubjectComponent);
   }

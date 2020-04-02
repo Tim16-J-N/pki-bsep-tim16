@@ -1,0 +1,29 @@
+mat-card {
+    max-width: 700px;
+    margin: 2em auto;
+  }
+  
+  .table {
+    margin-bottom: 0;
+  }
+    
+  .form-full-width {
+    width: 100%;
+  }
+  
+  .table-font {
+    font-size: 110%;
+  }
+  
+  .first {
+    width: 30%
+  }
+  
+  .date-err {
+    margin-top: .66667em;
+    font-size: 80%;
+  }
+    
+  .field-width {
+    width: 50%;
+  }

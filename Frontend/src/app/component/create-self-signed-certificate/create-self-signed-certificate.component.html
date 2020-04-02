@@ -1,10 +1,10 @@
 <mat-card>
     <mat-card-content>
-        <h2>Create certificate</h2>
+        <h2>Create self-signed certificate</h2>
         <mat-horizontal-stepper [linear]="true" #stepper>
             <mat-step [stepControl]="createCertificateFormSubject">
                 <form [formGroup]="createCertificateFormSubject">
-                    <ng-template matStepLabel>Subject</ng-template>
+                    <ng-template matStepLabel>Subject </ng-template>
                     <div class="row">
                         <div class="col-9">
                             <mat-form-field class="form-full-width">
@@ -95,94 +95,6 @@
                     </div>
                 </form>
             </mat-step>
-
-            <mat-step [stepControl]="createCertificateFormIssuer">
-                <form [formGroup]="createCertificateFormIssuer">
-                    <ng-template matStepLabel>Issuer</ng-template>
-                    <mat-form-field class="form-full-width">
-                        <mat-label>Choose existing issuer</mat-label>
-                        <mat-select formControlName="selectedIssuer">
-                            <mat-option *ngFor="let issuer of issuers" [value]="issuer">
-                                CN={{issuer.commonName}}, O={{issuer.organization}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <div *ngIf="getSelectedIssuer()">
-                        <mat-card>
-                            <h4 class="ml-1 mb-3">Selected issuer</h4>
-                            <mat-card-content>
-                                <div *ngIf="getSelectedIssuer().type == 'user'">
-                                    <table class="table table-font">
-                                        <tbody>
-                                            <tr>
-                                                <th class="first">Common name</th>
-                                                <td>{{getSelectedIssuer().commonName}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th class="first">Surname</th>
-                                                <td>{{getSelectedIssuer().surname}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th class="first">Givename</th>
-                                                <td>{{getSelectedIssuer().givename}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th class="first">Organization</th>
-                                                <td>{{getSelectedIssuer().organization}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th class="first">Email</th>
-                                                <td>{{getSelectedIssuer().email}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th class="first">Country code</th>
-                                                <td>{{getSelectedIssuer().countryCode}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div *ngIf="getSelectedIssuer().type == 'software'">
-                                    <table class="table table-font">
-                                        <tbody>
-                                            <tr>
-                                                <td class="first">Common name</td>
-                                                <td>{{getSelectedIssuer().commonName}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="first">Organization</td>
-                                                <td>{{getSelectedIssuer().organization}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="first">Organization unit</td>
-                                                <td>{{getSelectedIssuer().organizationUnitName}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="first">Locality</td>
-                                                <td>{{getSelectedIssuer().localityName}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="first">State/Province</td>
-                                                <td>{{getSelectedIssuer().state}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="first">Country code</td>
-                                                <td>{{getSelectedIssuer().countryCode}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </mat-card-content>
-                        </mat-card>
-                    </div>
-                    <div class="mt-3">
-                        <button mat-raised-button class="mr-3" color="primary" matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" matStepperNext
-                            [disabled]="!createCertificateFormIssuer.valid">Next</button>
-                    </div>
-                </form>
-            </mat-step>
-
             <mat-step [stepControl]="createCertificateFormOtherData">
                 <h4>Validity period</h4>
                 <form [formGroup]="createCertificateFormOtherData">
@@ -219,13 +131,6 @@
                     <div>
                         <h4>Extensions</h4>
                         <table class="form-full-width table-font mb-2">
-                            <tr>
-                                <td>
-                                    <mat-checkbox formControlName="subjectIsCa"> Subject is CA
-                                    </mat-checkbox>
-                                </td>
-
-                            </tr>
                             <tr>
                                 <td>
                                     <mat-checkbox formControlName="authorityKeyIdentifier"> Generate Authority Key

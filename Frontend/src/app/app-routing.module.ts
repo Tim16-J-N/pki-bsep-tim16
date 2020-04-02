@@ -7,6 +7,7 @@ import { LoginComponent } from './component/login/login.component';
 import { ListCertificatesComponent } from './component/list-certificates/list-certificates.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { CreateSelfSignedCertificateComponent } from './component/create-self-signed-certificate/create-self-signed-certificate.component';
 
 const routes: Routes = [
 
@@ -24,6 +25,11 @@ const routes: Routes = [
   {
     path: 'admin/create-certificate',
     component: CreateCertificateComponent,
+    canActivate: [AdminGuard],
+  },
+  {
+    path: 'admin/create-self-signed-certificate',
+    component: CreateSelfSignedCertificateComponent,
     canActivate: [AdminGuard],
   },
   //******************* ERROR PAGES ************************

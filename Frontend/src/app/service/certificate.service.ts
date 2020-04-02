@@ -18,5 +18,8 @@ export class CertificateService {
         return this.httpClient.post(this.url, certificate);
     }
 
+    public addSelfSigned(certificate: CreateCertificate) {
+        return this.httpClient.post(this.url + "/self-signed", certificate);
+    }
 
 }

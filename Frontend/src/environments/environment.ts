@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   itemsPerPage: 5,
   baseUrl: 'http://localhost:8080',
-  subject: '/api/subject',
+  entity: '/api/entity',
   certificate: '/api/certificate',
   auth: '/api/auth',
 };

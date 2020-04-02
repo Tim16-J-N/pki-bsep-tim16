@@ -29,7 +29,7 @@ public class AuthenticationController {
             }
             return new ResponseEntity<>(userTokenState, HttpStatus.OK);
         } catch (AuthenticationException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
