@@ -3,6 +3,7 @@ package ftn.pkibseptim16.dto;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 
 public class CertificateDTO {
 
@@ -38,6 +39,7 @@ public class CertificateDTO {
     public CertificateDTO(){
 
     }
+
     public BigInteger getSerialNumber() {
         return serialNumber;
     }

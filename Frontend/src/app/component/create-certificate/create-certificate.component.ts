@@ -74,8 +74,8 @@ export class CreateCertificateComponent implements OnInit {
       alias: new FormControl(null, Validators.required),
       password: new FormControl(null, Validators.required)
     });
-    this.subjects.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
-    this.issuers.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
+    this.subjects.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss", 1));
+    this.issuers.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss", 1));
 
   }
 

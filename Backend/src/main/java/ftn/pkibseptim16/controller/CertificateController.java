@@ -2,6 +2,7 @@ package ftn.pkibseptim16.controller;
 
 import ftn.pkibseptim16.dto.CertificateDTO;
 import ftn.pkibseptim16.dto.CreateCertificateDTO;
+import ftn.pkibseptim16.dto.CreatedCertificateDTO;
 import ftn.pkibseptim16.service.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,14 @@ public class CertificateController {
     @Autowired
     private CertificateService certificateService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value="/self-signed",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CertificateDTO> createSelfSigned(@Valid @RequestBody CreateCertificateDTO createCertificateDTO) {
+    public ResponseEntity<CreatedCertificateDTO> createSelfSigned(@Valid @RequestBody CreateCertificateDTO createCertificateDTO) {
         try {
-            CertificateDTO createdCertificate = certificateService.createSelfSigned(createCertificateDTO);
+            createCertificateDTO.getCertificate().getSubject().setId(1L);
+            createCertificateDTO.getCertificate().getIssuerCertificate().setIssuerUniqueId(1L);
+            CreatedCertificateDTO createdCertificate = certificateService.createSelfSigned(createCertificateDTO);
+
             if (createdCertificate == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
