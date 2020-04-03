@@ -21,6 +21,7 @@ import { TokenInterceptor } from './interseptor/token.interceptor';
 import { ErrorInterceptor } from './interseptor/error.interceptor';
 import { ChooseTemplateComponent } from './component/choose-template/choose-template.component';
 import { CreateSelfSignedCertificateComponent } from './component/create-self-signed-certificate/create-self-signed-certificate.component';
+import { CertificateDetailsComponent } from './component/certificate-details/certificate-details.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { CreateSelfSignedCertificateComponent } from './component/create-self-si
     ErrorComponent,
     ChooseTemplateComponent,
     CreateSelfSignedCertificateComponent,
+    CertificateDetailsComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +60,7 @@ import { CreateSelfSignedCertificateComponent } from './component/create-self-si
     CreateCertificateComponent,
     ListCertificatesComponent,
     ChooseTemplateComponent,
+    CertificateDetailsComponent,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },

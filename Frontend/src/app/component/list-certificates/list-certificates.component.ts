@@ -1,6 +1,6 @@
+import { CertificateDetailsComponent } from './../certificate-details/certificate-details.component';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { Entity } from './../../model/entity';
 import { Certificate } from './../../model/certificate';
 import { CertificateService } from './../../service/certificate.service';
 import { Component, OnInit } from '@angular/core';
@@ -34,23 +34,24 @@ export class ListCertificatesComponent implements OnInit {
   }
 
   fetchCertificates() {
-    //   this.certificateService.getCertificates(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword).subscribe(
-    //     (data: Certificate[]) => {
-    //       this.certificatesDataSource = new MatTableDataSource(data)
-    //     },
-    //     () => {
-    //       this.toastr.error('Wrong password. Please try again.', 'Show certificates');
-    //     });
-    // }
+    this.certificateService.getCertificates(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword).subscribe(
+      (data: Certificate[]) => {
+        this.certificatesDataSource = new MatTableDataSource(data)
+      },
+      () => {
+        this.toastr.error('Wrong password. Please try again.', 'Show certificates');
+      });
 
-    const subject = new Entity("user", "mera", "oaoaj", "sss", "ssds", "RS", "sss", "ddd", "sss", "sss", 1);
-    const issuer = new Entity("issuer", "issuer", "fdhdh", "sggds", "sdgsd", "RS", "gfhgf", "ddd", "sss", "sss", 2);
-    const cert = new Certificate(subject, issuer, "7/5/2020", "7/30/2021", true, true, true, null, null, 156489);
-    this.certificatesDataSource = new MatTableDataSource([cert, cert, cert]);
+    // const subject = new Entity("USER", "Perica", "pera@mail.com", null, "Firma doo", "RS", "Peric", "Petar", null, null, 1);
+    // const issuer = new Entity("SOFTWARE", "izdavac.com", null, "Izdavaci sertifikata", "Izdavac doo", "RS", null, null, "Novi Sad", "Vojvodina", 2);
+    // const keyUsage = new KeyUsage(true, true, false, true, false, true, true, false, false);
+    // const extKeyUsg = new ExtendedKeyUsage(true, false, false, true, false, false);
+    // const cert = new Certificate(subject, issuer, "7/5/2020", "7/30/2021", true, true, false, keyUsage, extKeyUsg, 156489);
+    // this.certificatesDataSource = new MatTableDataSource([cert]);
   }
 
   viewDetails(cert: Certificate) {
-
+    this.dialog.open(CertificateDetailsComponent, { data: cert });
   }
 
   download(cert: Certificate) {
