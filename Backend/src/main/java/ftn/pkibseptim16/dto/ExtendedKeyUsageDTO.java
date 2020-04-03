@@ -1,9 +1,11 @@
 package ftn.pkibseptim16.dto;
 
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ExtendedKeyUsageDTO {
     @NotNull
@@ -27,7 +29,36 @@ public class ExtendedKeyUsageDTO {
     public ExtendedKeyUsageDTO() {
 
     }
+    public ExtendedKeyUsageDTO(List<String> extendedKeyUsage) {
+        String IdKP = "1.3.6.1.5.5.7.3";
+        this.serverAuth =false;
+        this.clientAuth=false;
+        this.codeSigning=false;
+        this.emailProtection=false;
+        this.ocspSigning=false;
+        this.timeStamping=false;
+        if(extendedKeyUsage.contains(IdKP + ".1")){
+            this.serverAuth =true;
+        }
+        if(extendedKeyUsage.contains(IdKP + ".2")){
+            this.clientAuth =true;
+        }
 
+        if(extendedKeyUsage.contains(IdKP + ".3")){
+            this.codeSigning =true;
+        }
+
+        if(extendedKeyUsage.contains(IdKP + ".8")){
+            this.timeStamping =true;
+        }
+
+        if(extendedKeyUsage.contains(IdKP + ".4")){
+            this.emailProtection =true;
+        }
+        if(extendedKeyUsage.contains(IdKP + ".9")){
+            this.ocspSigning =true;
+        }
+    }
     public Boolean getServerAuth() {
         return serverAuth;
     }
@@ -80,12 +111,13 @@ public class ExtendedKeyUsageDTO {
         return serverAuth || clientAuth || codeSigning || emailProtection || timeStamping || ocspSigning;
     }
 
+
     public KeyPurposeId[] getKeyPurposeIds() {
         Boolean[] booleans = {serverAuth, clientAuth, codeSigning, emailProtection, timeStamping, ocspSigning};
         KeyPurposeId[] keyPurposeIds = {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_codeSigning,
                 KeyPurposeId.id_kp_emailProtection, KeyPurposeId.id_kp_timeStamping, KeyPurposeId.id_kp_OCSPSigning};
 
-        ArrayList<KeyPurposeId> setPurposes = new ArrayList<>();
+        List<KeyPurposeId> setPurposes = new ArrayList<>();
 
         for (int i = 0; i < booleans.length; i++) {
             if (booleans[i]) {
@@ -93,6 +125,9 @@ public class ExtendedKeyUsageDTO {
             }
         }
 
-        return (KeyPurposeId[]) setPurposes.toArray();
+        KeyPurposeId[] newKeyPurposeIds = new KeyPurposeId[setPurposes.size()];
+        for(int i = 0; i < setPurposes.size(); i++)
+            newKeyPurposeIds[i] = setPurposes.get(i);
+        return newKeyPurposeIds;
     }
 }

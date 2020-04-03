@@ -1,169 +1,160 @@
-<h1 mat-dialog-title>Add subject</h1>
+<h1 mat-dialog-title>Add new subject</h1>
 <mat-dialog-content class="dialog-class">
-    <div class="row">
-        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
-            <div class="section-title mb-0">
-                <form [formGroup]="createSubjectForm" class="form-full-width">
-                    <table class="form-full-width mt-3" cellspacing="0">
-                        <tr>
-                            <td><label>Type:</label></td>
-                            <td>
-                                <mat-radio-group aria-labelledby="kind-radio-group" class="form-full-width-td"
-                                    formControlName="type">
-                                    <mat-radio-button class="ml-4" (change)="onChange()" value="user" checked="checked">
-                                        User
-                                    </mat-radio-button>
-                                    <mat-radio-button class="ml-4" (change)="onChange()" value="software">Software
-                                    </mat-radio-button>
-                                </mat-radio-group>
-                            </td>
-                        </tr>
-                    </table>
-                    <div *ngIf="createSubjectForm.get('type').value && createSubjectForm.get('type').value=='user'">
+    <form [formGroup]="createSubjectForm" class="form-full-width">
+        <table class="form-full-width mt-2" cellspacing="0">
+            <tr>
+                <td><label id="type-radio-group">Type:</label></td>
+                <td>
+                    <mat-radio-group aria-labelledby="type-radio-group" class="form-full-width-td"
+                        formControlName="type">
+                        <mat-radio-button class="ml-4" (change)="onChange()" value="user" checked="checked">
+                            User
+                        </mat-radio-button>
+                        <mat-radio-button class="ml-4" (change)="onChange()" value="software">Software
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </td>
+            </tr>
+        </table>
+        <div *ngIf="createSubjectForm.get('type').value && createSubjectForm.get('type').value=='user'">
 
-                        <table class="form-full-width" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <mat-form-field class="form-full-width-td">
-                                        <input matInput placeholder="Common name" formControlName="commonName">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('commonName').errors && createSubjectForm.get('commonName').errors['required']">
-                                            Please enter common name.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class="form-full-width-td ml-2">
-                                        <input matInput placeholder="Email address" formControlName="email">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('email').errors && createSubjectForm.get('email').errors['email']">
-                                            Please enter valid email address.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="form-full-width" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <mat-form-field class="form-full-width-td">
-                                        <input matInput placeholder="Surname" formControlName="surname">
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class="form-full-width-td ml-2">
-                                        <input matInput placeholder="Givename" formControlName="givename">
-                                    </mat-form-field>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="form-full-width" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <mat-form-field class="form-full-width-td">
-                                        <input matInput placeholder="Organization" formControlName="organization">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('organization').errors && createSubjectForm.get('organization').errors['required']">
-                                            Please enter oranization's name.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class="form-full-width-td ml-2">
-                                        <input matInput placeholder="Country code " formControlName="countryCode">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['required']">
-                                            Please enter country code.
-                                        </mat-error>
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['maxlength']">
-                                            Country code length is 2.
-                                        </mat-error>
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['minlength']">
-                                            Country code length is 2.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div
-                        *ngIf="createSubjectForm.get('type').value && createSubjectForm.get('type').value == 'software'">
-
-                        <table class="form-full-width" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <mat-form-field class="form-full-width-td">
-                                        <input matInput placeholder="Common name" formControlName="commonName">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('commonName').errors && createSubjectForm.get('commonName').errors['required']">
-                                            Please enter common name.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class="form-full-width-td">
-                                        <input matInput placeholder="Organization " formControlName="organization">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('organization').errors && createSubjectForm.get('organization').errors['required']">
-                                            Please enter oranization's name.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="form-full-width" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <mat-form-field class="form-full-width-td ml-2">
-                                        <input matInput placeholder="Organization unit name "
-                                            formControlName="organizationUnitName">
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class=" form-full-width-td">
-                                        <input matInput placeholder="Country code " formControlName="countryCode">
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['required']">
-                                            Please enter countryCode.
-                                        </mat-error>
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['maxlength']">
-                                            Country code length is 2.
-                                        </mat-error>
-                                        <mat-error
-                                            *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['minlength']">
-                                            Country code length is 2.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <table class="form-full-width" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <mat-form-field class="form-full-width-td">
-                                        <input matInput placeholder="Locality name" formControlName="localityName">
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class="form-full-width-td ml-2">
-                                        <input matInput placeholder="State, or province name" formControlName="state">
-                                    </mat-form-field>
-                                </td>
-                            </tr>
-                        </table>
-
-                    </div>
-                    <mat-error *ngIf="createSubjectForm.errors && createSubjectForm.errors['formIsInvalid']">
-                        Please fill out all the fields
-                    </mat-error>
-                </form>
-            </div>
+            <table class="form-full-width" cellspacing="0">
+                <tr>
+                    <td>
+                        <mat-form-field class="form-full-width-td">
+                            <input matInput placeholder="Common name" formControlName="commonName">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('commonName').errors && createSubjectForm.get('commonName').errors['required']">
+                                Please enter common name.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="form-full-width-td ml-2">
+                            <input matInput placeholder="Organization" formControlName="organization">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('organization').errors && createSubjectForm.get('organization').errors['required']">
+                                Please enter oranization's name.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+            <table class="form-full-width" cellspacing="0">
+                <tr>
+                    <td>
+                        <mat-form-field class="form-full-width-td">
+                            <input matInput placeholder="Surname" formControlName="surname">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="form-full-width-td ml-2">
+                            <input matInput placeholder="Givename" formControlName="givename">
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+            <table class="form-full-width" cellspacing="0">
+                <tr>
+                    <td>
+                        <mat-form-field class="form-full-width-td">
+                            <input matInput placeholder="Email address" formControlName="email">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('email').errors && createSubjectForm.get('email').errors['email']">
+                                Please enter valid email address.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="form-full-width-td ml-2">
+                            <input matInput placeholder="Country code " formControlName="countryCode">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['required']">
+                                Please enter country code.
+                            </mat-error>
+                            <mat-error
+                                *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['maxlength']">
+                                Country code length is 2.
+                            </mat-error>
+                            <mat-error
+                                *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['minlength']">
+                                Country code length is 2.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
         </div>
-    </div>
+
+        <div *ngIf="createSubjectForm.get('type').value && createSubjectForm.get('type').value == 'software'">
+            <table class="form-full-width" cellspacing="0">
+                <tr>
+                    <td>
+                        <mat-form-field class="form-full-width-td">
+                            <input matInput placeholder="Common name" formControlName="commonName">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('commonName').errors && createSubjectForm.get('commonName').errors['required']">
+                                Please enter common name.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="form-full-width-td ml-2">
+                            <input matInput placeholder="Organization" formControlName="organization">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('organization').errors && createSubjectForm.get('organization').errors['required']">
+                                Please enter oranization's name.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+            <table class="form-full-width" cellspacing="0">
+                <tr>
+                    <td>
+                        <mat-form-field class="form-full-width-td">
+                            <input matInput placeholder="Organization unit" formControlName="organizationUnitName">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="form-full-width-td ml-2">
+                            <input matInput placeholder="Locality" formControlName="localityName">
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="form-full-width" cellspacing="0">
+                <tr>
+                    <td>
+                        <mat-form-field class="form-full-width-td">
+                            <input matInput placeholder="State/Province" formControlName="state">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class=" form-full-width-td ml-2">
+                            <input matInput placeholder="Country code" formControlName="countryCode">
+                            <mat-error
+                                *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['required']">
+                                Please enter countryCode.
+                            </mat-error>
+                            <mat-error
+                                *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['maxlength']">
+                                Country code length is 2.
+                            </mat-error>
+                            <mat-error
+                                *ngIf="createSubjectForm.get('countryCode').errors && createSubjectForm.get('countryCode').errors['minlength']">
+                                Country code length is 2.
+                            </mat-error>
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <mat-error *ngIf="createSubjectForm.errors && createSubjectForm.errors['formIsInvalid']">
+            Please fill out all the fields
+        </mat-error>
+    </form>
 </mat-dialog-content>
 
 <mat-dialog-actions class="mt-3 mb-1">

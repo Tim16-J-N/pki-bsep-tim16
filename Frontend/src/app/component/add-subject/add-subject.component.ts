@@ -20,6 +20,7 @@ const ValidForm: ValidatorFn = (fg: FormGroup) => {
 
   return null;
 };
+
 @Component({
   selector: 'app-add-subject',
   templateUrl: './add-subject.component.html',
@@ -45,7 +46,6 @@ export class AddSubjectComponent implements OnInit {
     }, {
       validator: [ValidForm]
     });
-
   }
 
   onChange() {
@@ -62,8 +62,8 @@ export class AddSubjectComponent implements OnInit {
         'state': ''
       }
     );
-
   }
+
   create() {
     if (this.createSubjectForm.invalid) {
       this.toastr.error("Please enter file out all the fields.", 'Create subject');

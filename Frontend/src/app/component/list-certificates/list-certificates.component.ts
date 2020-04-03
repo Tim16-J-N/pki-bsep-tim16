@@ -1,3 +1,4 @@
+import { CertificateService } from './../../service/certificate.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ChooseTemplateComponent } from '../choose-template/choose-template.component';
@@ -9,7 +10,7 @@ import { ChooseTemplateComponent } from '../choose-template/choose-template.comp
 })
 export class ListCertificatesComponent implements OnInit {
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public dialog: MatDialog, private certificateService: CertificateService) { }
 
   ngOnInit() {
   }
@@ -17,5 +18,6 @@ export class ListCertificatesComponent implements OnInit {
   openTemplatesDialog() {
     this.dialog.open(ChooseTemplateComponent);
   }
+
 
 }

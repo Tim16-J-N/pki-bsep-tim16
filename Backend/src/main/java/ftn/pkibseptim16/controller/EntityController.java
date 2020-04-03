@@ -11,9 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/entity")
@@ -36,5 +35,11 @@ public class EntityController {
         }catch (BadCredentialsException ex){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EntityDTO>> getAll() {
+        return new ResponseEntity<>(entityService.getAll(), HttpStatus.OK);
     }
 }

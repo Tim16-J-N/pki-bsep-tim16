@@ -36,6 +36,17 @@ public class KeyUsageDTO {
 
     }
 
+    public KeyUsageDTO(boolean[] keyUsage) {
+       this.digitalSignature = keyUsage[0];
+       this.nonRepudiation = keyUsage[1];
+       this.keyEncipherment = keyUsage[2];
+       this.dataEncipherment = keyUsage[3];
+       this.keyAgreement = keyUsage[4];
+       this.certificateSigning = keyUsage[5];
+       this.crlSign = keyUsage[6];
+       this.enchiperOnly = keyUsage[7];
+       this.decipherOnly = keyUsage[8];
+    }
     public Boolean getCertificateSigning() {
         return certificateSigning;
     }
@@ -148,4 +159,6 @@ public class KeyUsageDTO {
         return certificateSigning || crlSign || dataEncipherment || decipherOnly || digitalSignature || enchiperOnly ||
                 keyAgreement || keyEncipherment || nonRepudiation;
     }
+
+
 }

@@ -26,7 +26,8 @@ const TimeValidator: ValidatorFn = (fg: FormGroup) => {
 @Component({
   selector: 'app-create-self-signed-certificate',
   templateUrl: './create-self-signed-certificate.component.html',
-  styleUrls: ['./create-self-signed-certificate.component.css']
+  styleUrls: ['./create-self-signed-certificate.component.css'],
+
 })
 export class CreateSelfSignedCertificateComponent implements OnInit {
   createCertificateFormSubject: FormGroup;
@@ -49,9 +50,11 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
     this.functionForCreatingFormCertificateFormOtherData();
     this.functionForCreatingFormCertificateInfoAboutKeyStorage();
 
+    this.getSubjects();
+
     this.createdNewSubject = this.subjectService.createSuccessEmitter.subscribe(
       () => {
-        //getSubjects();
+        this.getSubjects();
       }
     );
 
@@ -66,10 +69,17 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
   functionForCreatingFormCertificateInfoAboutKeyStorage() {
     this.createCertificateInfoAboutKeyStorage = this.formBuilder.group({
       alias: new FormControl(null, Validators.required),
-      password: new FormControl(null, Validators.required)
+      password: new FormControl(null, Validators.required),
+      privateKeyPassword: new FormControl(null, Validators.required)
     });
-    this.subjects.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss"));
   }
+
+  getSubjects(): void {
+    this.subjectService.getAll().subscribe((subjects: Entity[]) => {
+      this.subjects = subjects;
+    })
+  }
+
 
   functionForCreatingFormCertificateFormOtherData() {
     this.createCertificateFormOtherData = this.formBuilder.group({
@@ -124,8 +134,8 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
     const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormSubject.value.selectedSubject,
       validFrom, validTo, this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
       true, keyUsage, extendedKeyUsage);
-    const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
-      this.createCertificateInfoAboutKeyStorage.value.password);
+    const createCertificate = new CreateCertificate(certificate, certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
+      this.createCertificateInfoAboutKeyStorage.value.password, this.createCertificateInfoAboutKeyStorage.value.privateKeyPassword);
 
     this.certificateService.addSelfSigned(createCertificate).subscribe(
       () => {

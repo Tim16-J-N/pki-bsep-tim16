@@ -10,8 +10,7 @@ import ftn.pkibseptim16.model.IssuerData;
 import ftn.pkibseptim16.model.SubjectData;
 import ftn.pkibseptim16.repository.EntityRepository;
 import ftn.pkibseptim16.service.CertificateService;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
+import ftn.pkibseptim16.service.KeyStoreService;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -48,14 +47,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private EntityRepository entityRepository;
 
+    @Autowired
+    private KeyStoreService keyStoreService;
+
     @Override
     public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws Exception {
-        CertificateDTO certificateDTO = createCertificateDTO.getCertificate();
+        CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.getById(certificateDTO.getSubject().getId());
-        Entity issuer = entityRepository.getById(certificateDTO.getIssuerCertificate().getIssuerUniqueId());
-        if (subject.getId() != issuer.getId()) {
-            throw new BadCredentialsException("Subject and issuer must be the same person");
-        }
 
         Date validFrom = getDate(certificateDTO.getValidFrom());
         Date validTo = getDate(certificateDTO.getValidTo());
@@ -68,6 +66,8 @@ public class CertificateServiceImpl implements CertificateService {
 
         X509Certificate cert = generateCertificate(subjectData, issuerData, validFrom, validTo, certificateDTO);
 
+        keyStoreService.store(createCertificateDTO.getKeyStorePassword(),createCertificateDTO.getAlias(),subjectData.getPrivateKey(),
+                createCertificateDTO.getPrivateKeyPassword(),cert);
         return new CreatedCertificateDTO(cert);
     }
 

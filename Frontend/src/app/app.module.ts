@@ -21,7 +21,7 @@ import { TokenInterceptor } from './interseptor/token.interceptor';
 import { ErrorInterceptor } from './interseptor/error.interceptor';
 import { ChooseTemplateComponent } from './component/choose-template/choose-template.component';
 import { CreateSelfSignedCertificateComponent } from './component/create-self-signed-certificate/create-self-signed-certificate.component';
-
+import { MatDatepickerModule } from '@angular/material';
 @NgModule({
   declarations: [
     AppComponent,
@@ -52,6 +52,8 @@ import { CreateSelfSignedCertificateComponent } from './component/create-self-si
     AppRoutingModule,
     MaterialModule,
     HttpClientModule,
+    MatDatepickerModule,
+
   ],
   entryComponents: [
     AddSubjectComponent,

@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class EntityServiceImpl implements EntityService {
 
@@ -27,6 +30,18 @@ public class EntityServiceImpl implements EntityService {
         return new EntityDTO(entityRepository.save(subject));
     }
 
+    @Override
+    public List<EntityDTO> getAll() {
+        return convertToDTO(entityRepository.findAll());
+    }
+
+    private List<EntityDTO> convertToDTO(List<Entity> entities){
+        List<EntityDTO> entityDTOS =new ArrayList<>();
+        for (Entity entity:entities) {
+            entityDTOS.add(new EntityDTO(entity));
+        }
+        return entityDTOS;
+    }
 
     private boolean isSubjectValid(EntityDTO entityDTO) throws IllegalArgumentException,BadCredentialsException{
         EntityType type = EntityType.valueOf(entityDTO.getType().toUpperCase());

@@ -25,7 +25,7 @@
                         <mat-card>
                             <h4 class="ml-1 mb-3">Selected subject</h4>
                             <mat-card-content>
-                                <div *ngIf="getSelectedSubject().type == 'user'">
+                                <div *ngIf="getSelectedSubject().type == 'USER'">
                                     <table class="table table-font">
                                         <tbody>
                                             <tr>
@@ -56,7 +56,7 @@
                                     </table>
                                 </div>
 
-                                <div *ngIf="getSelectedSubject().type == 'software'">
+                                <div *ngIf="getSelectedSubject().type == 'SOFTWARE'">
                                     <table class="table table-font">
                                         <tbody>
                                             <tr>
@@ -283,6 +283,15 @@
                         <mat-error
                             *ngIf="createCertificateInfoAboutKeyStorage.get('password').errors && createCertificateInfoAboutKeyStorage.get('password').errors['required']">
                             Please enter key store password.
+                        </mat-error>
+                    </mat-form-field>
+                    <br />
+                    <mat-form-field class="field-width">
+                        <input type="password" matInput formControlName="privateKeyPassword"
+                            placeholder="Private Key Password">
+                        <mat-error
+                            *ngIf="createCertificateInfoAboutKeyStorage.get('privateKeyPassword').errors && createCertificateInfoAboutKeyStorage.get('privateKeyPassword').errors['required']">
+                            Please enter private key password password.
                         </mat-error>
                     </mat-form-field>
                     <div class="mt-3">
