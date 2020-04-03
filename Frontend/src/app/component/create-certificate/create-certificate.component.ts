@@ -101,10 +101,7 @@ export class CreateCertificateComponent implements OnInit {
       alias: new FormControl(null, Validators.required),
       password: new FormControl(null, Validators.required),
       privateKeyPassword: new FormControl(null, Validators.required),
-<<<<<<< HEAD
       issuerKeyStorePassword: new FormControl(null, Validators.required),
-=======
->>>>>>> feature/listCertificates
       issuerPrivateKeyPassword: new FormControl(null, Validators.required)
     });
   }
