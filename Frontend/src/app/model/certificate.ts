@@ -2,11 +2,11 @@ import { ExtendedKeyUsage } from './extended.key.usage';
 import { KeyUsage } from './key.usage';
 import { Entity } from './entity';
 import { DateTime } from 'luxon';
-import { CACertificate } from './caCertificate';
+
 export class Certificate {
     serialNumber: number;
     subject: Entity;
-    issuerCertificate: CACertificate;
+    issuer: Entity;
     validFrom: DateTime;
     validTo: DateTime;
     authorityKeyIdentifier: boolean;
@@ -14,10 +14,10 @@ export class Certificate {
     subjectIsCa: boolean;
     keyUsage: KeyUsage;
     extendedKeyUsage: ExtendedKeyUsage;
-    constructor(subject: Entity, issuerCertificate: CACertificate, validFrom: DateTime, validTo: DateTime, authorityKeyIdentifier: boolean,
+    constructor(subject: Entity, issuer: Entity, validFrom: DateTime, validTo: DateTime, authorityKeyIdentifier: boolean,
         subjectKeyIdentifier: boolean, subjectIsCa: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, serialNumber?: number) {
         this.subject = subject;
-        this.issuerCertificate = issuerCertificate;
+        this.issuer = issuer;
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.authorityKeyIdentifier = authorityKeyIdentifier;

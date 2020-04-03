@@ -10,8 +10,6 @@ import ftn.pkibseptim16.model.IssuerData;
 import ftn.pkibseptim16.model.SubjectData;
 import ftn.pkibseptim16.repository.EntityRepository;
 import ftn.pkibseptim16.service.CertificateService;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -27,13 +25,10 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
@@ -50,9 +45,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws Exception {
-        CertificateDTO certificateDTO = createCertificateDTO.getCertificate();
+        CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.getById(certificateDTO.getSubject().getId());
-        Entity issuer = entityRepository.getById(certificateDTO.getIssuerCertificate().getIssuerUniqueId());
+        Entity issuer = entityRepository.getById(certificateDTO.getIssuer().getId());
         if (subject.getId() != issuer.getId()) {
             throw new BadCredentialsException("Subject and issuer must be the same person");
         }
@@ -77,7 +72,7 @@ public class CertificateServiceImpl implements CertificateService {
             return null;
         }
         X500Name x500Name = getX500Name(entity);
-        return new SubjectData(keyPairSubject.getPublic(), x500Name, entity.getId(),keyPairSubject.getPrivate());
+        return new SubjectData(keyPairSubject.getPublic(), x500Name, entity.getId(), keyPairSubject.getPrivate());
     }
 
     private IssuerData getIssuerForSelfSigned(SubjectData subjectData) {
@@ -86,7 +81,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     private KeyPair generateKeyPair() {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC","SunEC");
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", "SunEC");
 
             ECGenParameterSpec ecsp;
             ecsp = new ECGenParameterSpec("secp256k1");
@@ -181,8 +176,6 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     }
-
-
 
 
     private byte[] getSerialNumber() {

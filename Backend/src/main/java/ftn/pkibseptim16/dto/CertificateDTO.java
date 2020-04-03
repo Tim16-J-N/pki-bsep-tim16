@@ -3,7 +3,6 @@ package ftn.pkibseptim16.dto;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 
 public class CertificateDTO {
 
@@ -13,7 +12,7 @@ public class CertificateDTO {
     private EntityDTO subject;
 
     @NotNull
-    private CACertificateDTO issuerCertificate;
+    private EntityDTO issuer;
 
     @NotNull
     private Boolean authorityKeyIdentifier;
@@ -36,7 +35,9 @@ public class CertificateDTO {
     @NotNull
     private ExtendedKeyUsageDTO extendedKeyUsage;
 
-    public CertificateDTO(){
+    private String alias;
+
+    public CertificateDTO() {
 
     }
 
@@ -56,13 +57,6 @@ public class CertificateDTO {
         this.subject = subject;
     }
 
-    public CACertificateDTO getIssuerCertificate() {
-        return issuerCertificate;
-    }
-
-    public void setIssuerCertificate(CACertificateDTO issuerCertificate) {
-        this.issuerCertificate = issuerCertificate;
-    }
 
     public Boolean getAuthorityKeyIdentifier() {
         return authorityKeyIdentifier;
@@ -118,5 +112,21 @@ public class CertificateDTO {
 
     public void setExtendedKeyUsage(ExtendedKeyUsageDTO extendedKeyUsage) {
         this.extendedKeyUsage = extendedKeyUsage;
+    }
+
+    public EntityDTO getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(EntityDTO issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 }

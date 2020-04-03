@@ -18,5 +18,8 @@ export class SubjectService {
         return this.httpClient.post(this.url + "/create-subject", subject);
     }
 
+    public getAll(): any {
+        return this.httpClient.get(this.url + "/all");
+    }
 
 }

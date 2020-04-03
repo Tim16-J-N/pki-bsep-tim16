@@ -6,23 +6,24 @@ import javax.validation.constraints.NotNull;
 public class CreateCertificateDTO {
 
     @NotNull
-    private CertificateDTO certificate;
+    private CertificateDTO certificateData;
+
+    @NotNull
+    private CertificateDTO issuerCertificate;
 
     @NotEmpty(message = "Alias is empty.")
     private String alias;
 
     @NotEmpty(message = "Password to is empty.")
-    private String password;
+    private String keyStorePassword;
 
-    public CreateCertificateDTO(){
+    @NotEmpty(message = "Password for private key is empty")
+    private String privateKeyPassword;
 
-    }
-    public CertificateDTO getCertificate() {
-        return certificate;
-    }
+    private String issuerPrivateKeyPassword;
 
-    public void setCertificate(CertificateDTO certificate) {
-        this.certificate = certificate;
+    public CreateCertificateDTO() {
+
     }
 
     public String getAlias() {
@@ -33,11 +34,43 @@ public class CreateCertificateDTO {
         this.alias = alias;
     }
 
-    public String getPassword() {
-        return password;
+    public String getKeyStorePassword() {
+        return keyStorePassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setKeyStorePassword(String keyStorePassword) {
+        this.keyStorePassword = keyStorePassword;
+    }
+
+    public String getPrivateKeyPassword() {
+        return privateKeyPassword;
+    }
+
+    public void setPrivateKeyPassword(String privateKeyPassword) {
+        this.privateKeyPassword = privateKeyPassword;
+    }
+
+    public String getIssuerPrivateKeyPassword() {
+        return issuerPrivateKeyPassword;
+    }
+
+    public void setIssuerPrivateKeyPassword(String issuerPrivateKeyPassword) {
+        this.issuerPrivateKeyPassword = issuerPrivateKeyPassword;
+    }
+
+    public CertificateDTO getCertificateData() {
+        return certificateData;
+    }
+
+    public void setCertificateData(CertificateDTO certificateData) {
+        this.certificateData = certificateData;
+    }
+
+    public CertificateDTO getIssuerCertificate() {
+        return issuerCertificate;
+    }
+
+    public void setIssuerCertificate(CertificateDTO issuerCertificate) {
+        this.issuerCertificate = issuerCertificate;
     }
 }

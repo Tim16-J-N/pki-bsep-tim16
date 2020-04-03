@@ -1,12 +1,19 @@
 import { Certificate } from './certificate';
 
 export class CreateCertificate {
-    certificate: Certificate;
+    certificateData: Certificate;
+    issuerCertificate: Certificate;
     alias: string;
-    password: string;
-    constructor(certificate: Certificate, alias: string, password: string) {
-        this.certificate = certificate;
+    keyStorePassword: string;
+    privateKeyPassword: string;
+    issuerPrivateKeyPassword: string;
+
+    constructor(certificateData: Certificate, issuerCertificate: Certificate, alias: string, keyStorePassword: string, privateKeyPassword: string, issuerPrivateKeyPassword?: string) {
+        this.certificateData = certificateData;
+        this.issuerCertificate = issuerCertificate;
         this.alias = alias;
-        this.password = password;
+        this.keyStorePassword = keyStorePassword;
+        this.privateKeyPassword = privateKeyPassword;
+        this.issuerPrivateKeyPassword = issuerPrivateKeyPassword;
     }
 }

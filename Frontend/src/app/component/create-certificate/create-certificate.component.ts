@@ -55,9 +55,11 @@ export class CreateCertificateComponent implements OnInit {
     this.functionForCreatingFormCertificateFormOtherData();
     this.functionForCreatingFormCertificateInfoAboutKeyStorage();
 
+    this.getSubjects();
+
     this.createdNewSubject = this.subjectService.createSuccessEmitter.subscribe(
       () => {
-        //getSubjects();
+        this.getSubjects();
       }
     );
 
@@ -69,14 +71,20 @@ export class CreateCertificateComponent implements OnInit {
 
   }
 
+
+  getSubjects(): void {
+    this.subjectService.getAll().subscribe((subjects: Entity[]) => {
+      this.subjects = subjects;
+    })
+  }
+
   functionForCreatingFormCertificateInfoAboutKeyStorage() {
     this.createCertificateInfoAboutKeyStorage = this.formBuilder.group({
       alias: new FormControl(null, Validators.required),
-      password: new FormControl(null, Validators.required)
+      password: new FormControl(null, Validators.required),
+      privateKeyPassword: new FormControl(null, Validators.required),
+      issuerPrivateKeyPassword: new FormControl(null, Validators.required)
     });
-    this.subjects.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss", 1));
-    this.issuers.push(new Entity("user", "mera", "oaoaj", "sss", "ssds", "s", "sss", "ddd", "sss", "sss", 1));
-
   }
 
   functionForCreatingFormCertificateFormOtherData() {
@@ -139,7 +147,8 @@ export class CreateCertificateComponent implements OnInit {
       validFrom, validTo, this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
       this.createCertificateFormOtherData.value.subjectIsCa, keyUsage, extendedKeyUsage);
     const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
-      this.createCertificateInfoAboutKeyStorage.value.password);
+      this.createCertificateInfoAboutKeyStorage.value.password, this.createCertificateInfoAboutKeyStorage.value.privateKeyPassword,
+      this.createCertificateInfoAboutKeyStorage.value.issuerPrivateKeyPassword);
 
     this.certificateService.add(createCertificate).subscribe(
       () => {
