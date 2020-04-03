@@ -37,7 +37,7 @@ public class CertificateDTO {
 
     private String alias;
 
-    public CertificateDTO(){
+    public CertificateDTO() {
 
     }
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/api/certificate")
@@ -70,7 +71,7 @@ public class CertificateController {
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CertificateDTO>> getCACertificates(@RequestParam(value = "rootKeyStoragePassword") String rootKeyStoragePassword,
-                                                                @RequestParam(value = "intermediateKeyStoragePassword") String intermediateKeyStoragePassword) {
+                                                                  @RequestParam(value = "intermediateKeyStoragePassword") String intermediateKeyStoragePassword) {
         try{
             return new ResponseEntity<>(keyStoreService.getCACertificates(rootKeyStoragePassword,intermediateKeyStoragePassword), HttpStatus.OK);
         }catch (Exception e ){

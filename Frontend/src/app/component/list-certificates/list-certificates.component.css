@@ -1,0 +1,17 @@
+mat-card {
+    max-width: 1000px;
+    margin: 2em auto;
+}
+
+.download-btn {
+    color: white;
+    background-color: #00cc00;
+}
+
+.buttons-width {
+    width: 30%;
+}
+
+.table td {
+    vertical-align: middle;
+}

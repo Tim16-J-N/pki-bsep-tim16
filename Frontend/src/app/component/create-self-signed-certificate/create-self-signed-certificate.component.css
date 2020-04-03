@@ -27,3 +27,7 @@ mat-card {
   .field-width {
     width: 50%;
   }
+
+  th {
+    font-weight: 500;
+}

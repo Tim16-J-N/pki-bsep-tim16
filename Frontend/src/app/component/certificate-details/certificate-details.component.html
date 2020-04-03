@@ -1,0 +1,174 @@
+<h1 mat-dialog-title>Certificate Details</h1>
+<mat-dialog-content class="dialog-class">
+    <table class="table mb-2">
+        <tbody>
+            <tr>
+                <th class="first">Serial number</th>
+                <td>{{selectedCert.serialNumber}}</td>
+            </tr>
+            <tr>
+                <th class="first">Validity period</th>
+                <td>{{selectedCert.validFrom | date: 'd.M.yyyy.'}} —
+                    {{selectedCert.validTo | date: 'd.M.yyyy.'}}</td>
+            </tr>
+            <tr>
+                <th class="first">Certificate Authority (CA)</th>
+                <td>{{isCA()}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <mat-tab-group dynamicHeight class="mb-2">
+        <mat-tab label="Subject">
+            <div *ngIf="getSubject().type == 'USER'">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="first">Common name</th>
+                            <td>{{getSubject().commonName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Surname</th>
+                            <td>{{getSubject().surname}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Givename</th>
+                            <td>{{getSubject().givename}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Organization</th>
+                            <td>{{getSubject().organization}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Email</th>
+                            <td>{{getSubject().email}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Country code</th>
+                            <td>{{getSubject().countryCode}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="getSubject().type == 'SOFTWARE'">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="first">Common name</th>
+                            <td>{{getSubject().commonName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Organization</th>
+                            <td>{{getSubject().organization}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Organization unit</th>
+                            <td>{{getSubject().organizationUnitName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Locality</th>
+                            <td>{{getSubject().localityName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">State/Province</th>
+                            <td>{{getSubject().state}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Country code</th>
+                            <td>{{getSubject().countryCode}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </mat-tab>
+        <mat-tab label="Issuer">
+            <div *ngIf="getIssuer().type == 'USER'">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="first">Common name</th>
+                            <td>{{getIssuer().commonName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Surname</th>
+                            <td>{{getIssuer().surname}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Givename</th>
+                            <td>{{getIssuer().givename}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Organization</th>
+                            <td>{{getIssuer().organization}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Email</th>
+                            <td>{{getIssuer().email}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Country code</th>
+                            <td>{{getIssuer().countryCode}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="getIssuer().type == 'SOFTWARE'">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="first">Common name</th>
+                            <td>{{getIssuer().commonName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Organization</th>
+                            <td>{{getIssuer().organization}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Organization unit</th>
+                            <td>{{getIssuer().organizationUnitName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Locality</th>
+                            <td>{{getIssuer().localityName}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">State/Province</th>
+                            <td>{{getIssuer().state}}</td>
+                        </tr>
+                        <tr>
+                            <th class="first">Country code</th>
+                            <td>{{getIssuer().countryCode}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+    <mat-tab-group dynamicHeight>
+        <mat-tab label="Key Usage" *ngIf="hasKeyUsage()">
+            <mat-list>
+                <mat-list-item *ngIf="getKeyUsage().digitalSignature">• Digital Signature </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().nonRepudiation">• Non Repudiation </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().keyEncipherment">• Key Encipherment </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().dataEncipherment">• Data Encipherment </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().keyAgreement">• Key Agreement </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().certificateSigning">• Certificate Signing </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().crlSign">• CRL Sign </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().enchiperOnly">• Encipher Only </mat-list-item>
+                <mat-list-item *ngIf="getKeyUsage().decipherOnly">• Decipher Only </mat-list-item>
+            </mat-list>
+        </mat-tab>
+        <mat-tab label="Extended Key Usage" *ngIf="hasExtendedKeyUsage()">
+            <mat-list>
+                <mat-list-item *ngIf="getExtendedKeyUsage().serverAuth">• TLS Web Server Authentication </mat-list-item>
+                <mat-list-item *ngIf="getExtendedKeyUsage().clientAuth">• TLS Web Client Authentication </mat-list-item>
+                <mat-list-item *ngIf="getExtendedKeyUsage().codeSigning">• Code Signing </mat-list-item>
+                <mat-list-item *ngIf="getExtendedKeyUsage().emailProtection">• E-mail Protection </mat-list-item>
+                <mat-list-item *ngIf="getExtendedKeyUsage().timeStamping">• Time Stamping </mat-list-item>
+                <mat-list-item *ngIf="getExtendedKeyUsage().ocspSigning">• OCSP Signing </mat-list-item>
+            </mat-list>
+        </mat-tab>
+    </mat-tab-group>
+</mat-dialog-content>

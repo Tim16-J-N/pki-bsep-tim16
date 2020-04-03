@@ -27,12 +27,10 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
@@ -114,7 +112,7 @@ public class CertificateServiceImpl implements CertificateService {
             return null;
         }
         X500Name x500Name = getX500Name(entity);
-        return new SubjectData(keyPairSubject.getPublic(), x500Name, entity.getId(),keyPairSubject.getPrivate());
+        return new SubjectData(keyPairSubject.getPublic(), x500Name, entity.getId(), keyPairSubject.getPrivate());
     }
 
     private IssuerData getIssuerForSelfSigned(SubjectData subjectData) {
@@ -133,7 +131,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
     private KeyPair generateKeyPair() {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC","SunEC");
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", "SunEC");
 
             ECGenParameterSpec ecsp;
             ecsp = new ECGenParameterSpec("secp256k1");
@@ -226,6 +224,7 @@ public class CertificateServiceImpl implements CertificateService {
             return false;
         }
 
+
         if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null){
             List<Integer> subjectFalseKeyUsages = newCertificateDTO.getKeyUsage().getFalseKeyUsageIdentifiers();
             List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().getFalseKeyUsageIdentifiers();
@@ -248,6 +247,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         return true;
     }
+
     private byte[] getSerialNumber() {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[20];

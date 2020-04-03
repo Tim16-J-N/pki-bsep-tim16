@@ -60,27 +60,27 @@
                                     <table class="table table-font">
                                         <tbody>
                                             <tr>
-                                                <td class="first">Common name</td>
+                                                <th class="first">Common name</th>
                                                 <td>{{getSelectedSubject().commonName}}</td>
                                             </tr>
                                             <tr>
-                                                <td class="first">Organization</td>
+                                                <th class="first">Organization</th>
                                                 <td>{{getSelectedSubject().organization}}</td>
                                             </tr>
                                             <tr>
-                                                <td class="first">Organization unit</td>
+                                                <th class="first">Organization unit</th>
                                                 <td>{{getSelectedSubject().organizationUnitName}}</td>
                                             </tr>
                                             <tr>
-                                                <td class="first">Locality</td>
+                                                <th class="first">Locality</th>
                                                 <td>{{getSelectedSubject().localityName}}</td>
                                             </tr>
                                             <tr>
-                                                <td class="first">State/Province</td>
+                                                <th class="first">State/Province</th>
                                                 <td>{{getSelectedSubject().state}}</td>
                                             </tr>
                                             <tr>
-                                                <td class="first">Country code</td>
+                                                <th class="first">Country code</th>
                                                 <td>{{getSelectedSubject().countryCode}}</td>
                                             </tr>
                                         </tbody>
@@ -163,7 +163,7 @@
                                     <tr>
                                         <td>
                                             <mat-checkbox formControlName="digitalSignature">Digital
-                                                signature</mat-checkbox>
+                                                Signature</mat-checkbox>
                                         </td>
                                         <td>
                                             <mat-checkbox formControlName="nonRepudiation">
@@ -225,28 +225,28 @@
                                 <table class="form-full-width table-font" formGroupName="extentendedKeyUsage">
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="serverAuth"> TLS Web server
-                                                authentication</mat-checkbox>
+                                            <mat-checkbox formControlName="serverAuth"> TLS Web Server
+                                                Authentication</mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="codeSigning"> Code signing
+                                            <mat-checkbox formControlName="codeSigning"> Code Signing
                                             </mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <mat-checkbox formControlName="clientAuth">
-                                                TLS Web client authentication
+                                                TLS Web Client Authentication
                                             </mat-checkbox>
                                         </td>
                                         <td>
                                             <mat-checkbox formControlName="emailProtection">
-                                                E-mail protection</mat-checkbox>
+                                                E-mail Protection</mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="timeStamping">TimeStamping
+                                            <mat-checkbox formControlName="timeStamping">Time Stamping
                                             </mat-checkbox>
                                         </td>
                                         <td>

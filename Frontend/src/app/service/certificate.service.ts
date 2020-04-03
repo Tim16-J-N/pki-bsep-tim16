@@ -1,5 +1,4 @@
 import { CreateCertificate } from './../model/create.certificate';
-import { Certificate } from './../model/certificate';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
@@ -39,4 +38,14 @@ export class CertificateService {
             params: params
         });
     }
+    public getCertificates(keyStoreLevel: string, keyStorePassword: string) {
+        let params = new HttpParams();
+        params = params.append('role', keyStoreLevel);
+        params = params.append('keyStorePassword', keyStorePassword);
+
+        return this.httpClient.get(this.url + '/all-from-keystore', {
+            params: params
+        });
+    }
+
 }
