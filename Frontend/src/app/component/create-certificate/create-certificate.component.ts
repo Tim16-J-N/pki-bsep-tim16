@@ -23,6 +23,15 @@ const TimeValidator: ValidatorFn = (fg: FormGroup) => {
   return from !== null && to !== null && from < to ? null : { validError: true };
 };
 
+const KeyStoragePasswordValidator: ValidatorFn = (fg: FormGroup) => {
+  const from = fg.get('rootKeyStoragePassword').value;
+  const to = fg.get('intermediateKeyStoragePassword').value;
+  if (from || to) {
+    return null;
+  }
+  return { validKeyStoragePasword: true };
+};
+
 @Component({
   selector: 'app-create-certificate',
   templateUrl: './create-certificate.component.html',
@@ -33,6 +42,8 @@ export class CreateCertificateComponent implements OnInit {
   createCertificateFormIssuer: FormGroup;
   createCertificateFormOtherData: FormGroup;
   createCertificateInfoAboutKeyStorage: FormGroup;
+  createCertificateKeyStoragePasswords: FormGroup;
+
   minDate = new Date();
   subjects: Entity[] = [];
   //ovo ces morati da promenis posto on fakticki bira sertifikate a ne issuer-a. Vidi kako i sta ces slati sve ovde na frontend
@@ -46,6 +57,13 @@ export class CreateCertificateComponent implements OnInit {
   ngOnInit() {
     this.createCertificateFormSubject = this.formBuilder.group({
       selectedSubject: new FormControl(null, Validators.required),
+    });
+
+    this.createCertificateKeyStoragePasswords = this.formBuilder.group({
+      rootKeyStoragePassword: new FormControl(null),
+      intermediateKeyStoragePassword: new FormControl(null),
+    }, {
+      validator: [KeyStoragePasswordValidator]
     });
 
     this.createCertificateFormIssuer = this.formBuilder.group({
@@ -83,6 +101,7 @@ export class CreateCertificateComponent implements OnInit {
       alias: new FormControl(null, Validators.required),
       password: new FormControl(null, Validators.required),
       privateKeyPassword: new FormControl(null, Validators.required),
+      issuerKeyStorePassword: new FormControl(null, Validators.required),
       issuerPrivateKeyPassword: new FormControl(null, Validators.required)
     });
   }
@@ -117,6 +136,7 @@ export class CreateCertificateComponent implements OnInit {
       validator: [TimeValidator]
     });
   }
+
   getSelectedSubject() {
     return this.createCertificateFormSubject.get('selectedSubject').value;
   }
@@ -124,6 +144,7 @@ export class CreateCertificateComponent implements OnInit {
   getSelectedIssuer() {
     return this.createCertificateFormIssuer.get('selectedIssuer').value;
   }
+
   createCertificate() {
     if (this.createCertificateFormSubject.invalid) {
       this.toastr.error("Please choose subject", 'Create certificate');
@@ -148,7 +169,7 @@ export class CreateCertificateComponent implements OnInit {
       this.createCertificateFormOtherData.value.subjectIsCa, keyUsage, extendedKeyUsage);
     const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
       this.createCertificateInfoAboutKeyStorage.value.password, this.createCertificateInfoAboutKeyStorage.value.privateKeyPassword,
-      this.createCertificateInfoAboutKeyStorage.value.issuerPrivateKeyPassword);
+      this.createCertificateInfoAboutKeyStorage.value.issuerPrivateKeyPassword, this.createCertificateInfoAboutKeyStorage.value.issuerKeyStorePassword);
 
     this.certificateService.add(createCertificate).subscribe(
       () => {
@@ -208,8 +229,16 @@ export class CreateCertificateComponent implements OnInit {
       }
     );
   }
+
   openAddSubject() {
     this.dialog.open(AddSubjectComponent);
   }
 
+  getCACertificates() {
+    this.certificateService.getCACertificates(this.createCertificateKeyStoragePasswords.value.rootKeyStoragePassword,
+      this.createCertificateKeyStoragePasswords.value.intermediateKeyStoragePassword).
+      subscribe((subjects: Entity[]) => {
+        this.subjects = subjects;
+      })
+  }
 }

@@ -5,6 +5,7 @@ import ftn.pkibseptim16.dto.CertificateDTO;
 import ftn.pkibseptim16.dto.CreateCertificateDTO;
 import ftn.pkibseptim16.dto.CreatedCertificateDTO;
 import ftn.pkibseptim16.dto.KeyUsageDTO;
+import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.model.Entity;
 import ftn.pkibseptim16.model.IssuerData;
 import ftn.pkibseptim16.model.SubjectData;
@@ -35,11 +36,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -71,7 +75,40 @@ public class CertificateServiceImpl implements CertificateService {
         return new CreatedCertificateDTO(cert);
     }
 
-    public SubjectData getSubject(Entity entity) {
+    @Override
+    public CreatedCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws Exception {
+        CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
+        Entity subject = entityRepository.getById(certificateDTO.getSubject().getId());
+        CertificateDTO issuerCertificate = createCertificateDTO.getIssuerCertificate();
+        Entity issuer = entityRepository.getById(issuerCertificate.getSubject().getId());
+        if(subject.getId() == issuer.getId()){
+            throw new BadCredentialsException("Issuer and subject is the same entity.");
+        }
+
+        Date validFrom = getDate(certificateDTO.getValidFrom());
+        Date validTo = getDate(certificateDTO.getValidTo());
+        if (validFrom.before(new Date()) || validFrom.after(validTo)) {
+            throw new BadCredentialsException("Start date of validity period must be before end date.");
+        }
+
+        //proveri da li je vreme ok
+        //dodaj proveru da li se ekstenzije poklapaju
+        //dodaj proveru da li je sertifikat kojim zelis da potpises validan
+        if(!certificateDataIsValid(certificateDTO,issuerCertificate,validFrom,validTo)){
+            throw new BadCredentialsException("Certificate is invalid");
+        }
+        SubjectData subjectData = getSubject(subject);
+
+        IssuerData issuerData = getIssuer( issuer,  issuerCertificate, createCertificateDTO.getIssuerKeyStorePassword(), createCertificateDTO.getIssuerPrivateKeyPassword());
+
+        X509Certificate cert = generateCertificate(subjectData, issuerData, validFrom, validTo, certificateDTO);
+
+        keyStoreService.store(createCertificateDTO.getKeyStorePassword(),createCertificateDTO.getAlias(),subjectData.getPrivateKey(),
+                createCertificateDTO.getPrivateKeyPassword(),cert);
+        return new CreatedCertificateDTO(cert);
+    }
+
+    private SubjectData getSubject(Entity entity) {
         KeyPair keyPairSubject = generateKeyPair();
         if (keyPairSubject == null) {
             return null;
@@ -84,6 +121,16 @@ public class CertificateServiceImpl implements CertificateService {
         return new IssuerData(subjectData.getX500name(), subjectData.getPrivateKey(), subjectData.getPublicKey(), subjectData.getId());
     }
 
+    private IssuerData getIssuer(Entity issuer, CertificateDTO issuerCertificate,String keyStorePassword,String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        X500Name x500Name = getX500Name(issuer);
+        CertificateRole certificateRole = CertificateRole.INTERMEDIATE;
+        if(issuerCertificate.getSubject().getId() == issuerCertificate.getIssuer().getId()){
+            certificateRole = CertificateRole.ROOT;
+        }
+        PrivateKey privateKey = keyStoreService.getPrivateKey(certificateRole,keyStorePassword,issuerCertificate.getAlias(),issuerPrivateKeyPassword);
+        PublicKey publicKey = keyStoreService.getPublicKey(certificateRole,keyStorePassword,issuerCertificate.getAlias());
+        return new IssuerData(x500Name, privateKey, publicKey, issuer.getId());
+    }
     private KeyPair generateKeyPair() {
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC","SunEC");
@@ -91,7 +138,6 @@ public class CertificateServiceImpl implements CertificateService {
             ECGenParameterSpec ecsp;
             ecsp = new ECGenParameterSpec("secp256k1");
             kpg.initialize(ecsp);
-
 //            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //ok
 //            SecureRandom random = SecureRandom.getInstance("Windows-PRNG");
 //            keyGen.initialize(3072, random);
@@ -102,7 +148,7 @@ public class CertificateServiceImpl implements CertificateService {
         return null;
     }
 
-    public X500Name getX500Name(Entity entity) {
+    private X500Name getX500Name(Entity entity) {
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
         builder.addRDN(BCStyle.CN, entity.getCommonName());
         builder.addRDN(BCStyle.O, entity.getOrganization());
@@ -163,28 +209,45 @@ public class CertificateServiceImpl implements CertificateService {
                 .setProvider(new BouncyCastleProvider()).getCertificate(certGen.build(contentSigner));
     }
 
-    private static SubjectKeyIdentifier createSubjectKeyId(PublicKey publicKey) throws OperatorCreationException {
-        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
-        DigestCalculator digCalc =
-                new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+    //proveri da li je vreme ok
+    //dodaj proveru da li se ekstenzije poklapaju
+    //DODAJ PROVERU DA LI JE SERTIFIKAT KOJIM ZELIS DA POTPUSES VALIDAN
+    private boolean certificateDataIsValid(CertificateDTO newCertificateDTO,CertificateDTO issuerCertificate, Date validFrom, Date validTo) throws ParseException {
 
-        return new X509ExtensionUtils(digCalc).createSubjectKeyIdentifier(publicKeyInfo);
+        if(validFrom.before(getDate(issuerCertificate.getValidFrom())) || validTo.after(getDate(issuerCertificate.getValidTo()))){
+            return false;
+        }
+
+        if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() == null ){
+            return false;
+        }
+
+        if(issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() == null ){
+            return false;
+        }
+
+        if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null){
+            List<Integer> subjectFalseKeyUsages = newCertificateDTO.getKeyUsage().getFalseKeyUsageIdentifiers();
+            List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().getFalseKeyUsageIdentifiers();
+            for (Integer identifier:issuerFalseKeyUsages) {
+                if(!subjectFalseKeyUsages.contains(identifier)){
+                    return false;
+                }
+            }
+        }
+
+        if(issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() != null){
+            List<KeyPurposeId> subjectFalseExtendedKeyUsages = newCertificateDTO.getExtendedKeyUsage().getFalseExtendedKeyUsageIdentifiers();
+            List<KeyPurposeId> issuerFalseExtendedKeyUsages = issuerCertificate.getExtendedKeyUsage().getFalseExtendedKeyUsageIdentifiers();
+            for (KeyPurposeId identifier:issuerFalseExtendedKeyUsages) {
+                if(!subjectFalseExtendedKeyUsages.contains(identifier)){
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
-
-    private static AuthorityKeyIdentifier createAuthorityKeyId(PublicKey publicKey)
-            throws OperatorCreationException {
-        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
-        DigestCalculator digCalc =
-                new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
-
-        return new X509ExtensionUtils(digCalc).createAuthorityKeyIdentifier(publicKeyInfo);
-
-
-    }
-
-
-
-
     private byte[] getSerialNumber() {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[20];

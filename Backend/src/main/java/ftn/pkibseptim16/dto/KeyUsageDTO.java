@@ -1,8 +1,11 @@
 package ftn.pkibseptim16.dto;
 
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KeyUsageDTO {
     @NotNull
@@ -160,5 +163,18 @@ public class KeyUsageDTO {
                 keyAgreement || keyEncipherment || nonRepudiation;
     }
 
+    public List<Integer> getFalseKeyUsageIdentifiers() {
+        Boolean[] booleans = {digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,
+                certificateSigning, crlSign, enchiperOnly,decipherOnly};
+        Integer[] keyUsages = {0,1,2,3,4,5,6,7,8};
 
+        List<Integer> falseValues = new ArrayList<>();
+
+        for (int i = 0; i < booleans.length; i++) {
+            if (!booleans[i]) {
+                falseValues.add(keyUsages[i]);
+            }
+        }
+        return falseValues;
+    }
 }

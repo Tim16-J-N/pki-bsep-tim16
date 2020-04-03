@@ -20,6 +20,8 @@ public class CreateCertificateDTO {
     @NotEmpty(message="Password for private key is empty")
     private String privateKeyPassword;
 
+    private String issuerKeyStorePassword;
+
     private String issuerPrivateKeyPassword;
 
     public CreateCertificateDTO(){
@@ -72,5 +74,13 @@ public class CreateCertificateDTO {
 
     public void setIssuerCertificate(CertificateDTO issuerCertificate) {
         this.issuerCertificate = issuerCertificate;
+    }
+
+    public String getIssuerKeyStorePassword() {
+        return issuerKeyStorePassword;
+    }
+
+    public void setIssuerKeyStorePassword(String issuerKeyStorePassword) {
+        this.issuerKeyStorePassword = issuerKeyStorePassword;
     }
 }

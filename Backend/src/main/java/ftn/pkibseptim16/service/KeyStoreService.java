@@ -20,4 +20,6 @@ public interface KeyStoreService {
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     List<CertificateDTO> getCertificates(String role,String keyStorePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
+    List<CertificateDTO> getCACertificates(String rootKeyStoragePassword,String intermediateKeyStoragePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 }

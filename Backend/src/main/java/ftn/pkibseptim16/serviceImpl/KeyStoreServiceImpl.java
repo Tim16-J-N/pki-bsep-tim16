@@ -9,6 +9,7 @@ import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.service.KeyStoreService;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -70,6 +71,37 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         Enumeration<String> aliases = keyStore.aliases();
         List<CertificateDTO> certificateDTOS = new ArrayList<>();
 
+        while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            certificateDTOS.add(createCertificateDTO((X509Certificate) keyStore.getCertificate(alias), alias));
+            i++;
+        }
+        return certificateDTOS;
+    }
+
+    @Override
+    public List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        if(rootKeyStoragePassword.isEmpty() && intermediateKeyStoragePassword.isEmpty()){
+            throw new BadCredentialsException("You have to enter at least one of the passwords.");
+        }
+        List<CertificateDTO> certificateDTOS = new ArrayList<>();
+        if(!rootKeyStoragePassword.isEmpty()){
+            loadCertificates(certificateDTOS,rootKeyStoragePassword,"root");
+        }
+
+        if(!intermediateKeyStoragePassword.isEmpty()){
+            loadCertificates(certificateDTOS,intermediateKeyStoragePassword,"intermediate");
+        }
+
+        return certificateDTOS;
+    }
+
+    private  List<CertificateDTO> loadCertificates(List<CertificateDTO> certificateDTOS, String keyStorePassword,String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+
+        String keyStorePath = getKeyStorePath(getCertificateRole(role));
+        KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
+        int i = 0;
+        Enumeration<String> aliases = keyStore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             certificateDTOS.add(createCertificateDTO((X509Certificate) keyStore.getCertificate(alias), alias));

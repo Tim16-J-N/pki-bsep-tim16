@@ -130,4 +130,20 @@ public class ExtendedKeyUsageDTO {
             newKeyPurposeIds[i] = setPurposes.get(i);
         return newKeyPurposeIds;
     }
+
+    public List<KeyPurposeId> getFalseExtendedKeyUsageIdentifiers() {
+        Boolean[] booleans = {serverAuth, clientAuth, codeSigning, emailProtection, timeStamping, ocspSigning};
+        KeyPurposeId[] keyPurposeIds = {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_codeSigning,
+                KeyPurposeId.id_kp_emailProtection, KeyPurposeId.id_kp_timeStamping, KeyPurposeId.id_kp_OCSPSigning};
+
+        List<KeyPurposeId> setPurposes = new ArrayList<>();
+
+        for (int i = 0; i < booleans.length; i++) {
+            if (!booleans[i]) {
+                setPurposes.add(keyPurposeIds[i]);
+            }
+        }
+
+        return setPurposes;
+    }
 }
