@@ -141,7 +141,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     private CertificateDTO createCertificateDTO(X509Certificate x509Certificate, String alias)
             throws CertificateEncodingException, CertificateParsingException {
         CertificateDTO certificateDTO = new CertificateDTO();
-        certificateDTO.setSerialNumber(x509Certificate.getSerialNumber());
+        certificateDTO.setSerialNumber(x509Certificate.getSerialNumber().toString(16));
         X500Name x500name = new JcaX509CertificateHolder(x509Certificate).getSubject();
         boolean[] subjectUniqueID = x509Certificate.getSubjectUniqueID();
 
@@ -151,10 +151,10 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         boolean[] issuerUniqueID = x509Certificate.getIssuerUniqueID();
         certificateDTO.setIssuer(new EntityDTO(x500nameIssuer, booleanArrayToLong(issuerUniqueID)));
 
-        if (x509Certificate.getExtensionValue("2.5.29.35").length != 0) {
+        if (x509Certificate.getExtensionValue("2.5.29.35") != null) {
             certificateDTO.setAuthorityKeyIdentifier(true);
         }
-        if (x509Certificate.getExtensionValue("2.5.29.14").length != 0) {
+        if (x509Certificate.getExtensionValue("2.5.29.14")  != null) {
             certificateDTO.setSubjectKeyIdentifier(true);
         }
         if (x509Certificate.getBasicConstraints() != -1) {

@@ -233,7 +233,7 @@ export class CreateCertificateComponent implements OnInit {
         this.router.navigate(['/admin/certificates']);
       },
       () => {
-        this.toastr.error('Error ', 'Create certificate');
+        this.toastr.error('Please enter valid data ', 'Create certificate');
       }
     );
   }
@@ -284,6 +284,11 @@ export class CreateCertificateComponent implements OnInit {
   }
 
   setExtensionsAfterChoosingIssuer() {
+    console.log(this.selectedTemplate)
+    console.log(this.getSelectedIssuerCertificate().keyUsage)
+    if (!this.getSelectedIssuerCertificate().keyUsage) {
+      return;
+    }
     this.createCertificateFormOtherData.patchValue(
       {
         'keyUsage': {
@@ -326,12 +331,9 @@ export class CreateCertificateComponent implements OnInit {
 
   checkIfIssuerCertificateKeyUsageExists() {
     const selectedIssuerCertificate = this.createCertificateFormIssuer.value.selectedIssuerCertificate;
-    console.log(selectedIssuerCertificate)
     if (!selectedIssuerCertificate) {
-      console.log("haj4")
       return false;
     } else if (!selectedIssuerCertificate.keyUsage) {
-      console.log("haj5")
       return false;
     }
     return true;

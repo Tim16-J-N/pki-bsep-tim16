@@ -4,7 +4,7 @@ import { Entity } from './entity';
 import { DateTime } from 'luxon';
 
 export class Certificate {
-    serialNumber: number;
+    serialNumber: string;
     subject: Entity;
     issuer: Entity;
     validFrom: DateTime;
@@ -16,7 +16,7 @@ export class Certificate {
     extendedKeyUsage: ExtendedKeyUsage;
     alias: string;
     constructor(subject: Entity, issuer: Entity, validFrom: DateTime, validTo: DateTime, authorityKeyIdentifier: boolean,
-        subjectKeyIdentifier: boolean, subjectIsCa: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, alias?: string, serialNumber?: number) {
+        subjectKeyIdentifier: boolean, subjectIsCa: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, alias?: string, serialNumber?: string) {
         this.subject = subject;
         this.issuer = issuer;
         this.validFrom = validFrom;

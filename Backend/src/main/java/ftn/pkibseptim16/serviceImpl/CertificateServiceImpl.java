@@ -118,8 +118,7 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate certificate = keyStoreService.getCertificate(certRole, downloadCertDTO.getKeyStorePassword(),
                 alias);
 
-        FileOutputStream os = new FileOutputStream(
-                System.getProperty("user.home") + "/" + certRoleStr + "_" + alias + ".cer");
+        FileOutputStream os = new FileOutputStream(certRoleStr + "_" + alias + ".cer");
         os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
         os.write(Base64.encodeBase64(certificate.getEncoded(), true));
         os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));
@@ -207,7 +206,7 @@ public class CertificateServiceImpl implements CertificateService {
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256withECDSA");
         builder = builder.setProvider("BC");
         ContentSigner contentSigner = builder.build(issuerData.getPrivateKey());
-        BigInteger serialNumber = new BigInteger(getSerialNumber());
+        BigInteger serialNumber = new BigInteger(1,getSerialNumber());
         X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuerData.getX500name(), serialNumber,
                 validFrom, validTo, subjectData.getX500name(), subjectData.getPublicKey());
 

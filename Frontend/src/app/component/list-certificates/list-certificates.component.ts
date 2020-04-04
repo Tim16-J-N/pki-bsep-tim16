@@ -1,4 +1,4 @@
-import { DownloadCertificateComponent } from './../download-certificate/download-certificate.component';
+
 import { CertificateDetailsComponent } from './../certificate-details/certificate-details.component';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
@@ -38,8 +38,14 @@ export class ListCertificatesComponent implements OnInit {
     this.certificateService.getCertificates(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword).subscribe(
       (data: Certificate[]) => {
         this.certificatesDataSource = new MatTableDataSource(data)
+        if (data.length == 0) {
+          this.toastr.info('No certificates the in specified KeyStore.', 'Show certificates');
+        }
+
       },
       () => {
+        const data: Certificate[] = []
+        this.certificatesDataSource = new MatTableDataSource(data)
         this.toastr.error('Wrong password. Please try again.', 'Show certificates');
       });
 
@@ -55,13 +61,15 @@ export class ListCertificatesComponent implements OnInit {
     this.dialog.open(CertificateDetailsComponent, { data: cert });
   }
 
-  download() {
-    this.dialog.open(DownloadCertificateComponent, {
-      data: {
-        certRole: this.keyStoreForm.value.certRole,
-        keyStorePassword: this.keyStoreForm.value.keyStorePassword
+  download(element: Certificate) {
+    this.certificateService.download(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, element.alias).subscribe(
+      () => {
+        this.toastr.success('Success!', 'Download certificate');
+      },
+      () => {
+        this.toastr.error('Error while downloading.', 'Download certificate');
       }
-    });
+    )
   }
 
   revoke(cert: Certificate) {

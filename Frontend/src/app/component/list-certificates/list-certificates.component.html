@@ -23,7 +23,8 @@
                     </mat-error>
                 </mat-form-field>
                 <div class="col-3">
-                    <button mat-raised-button color="primary" (click)="fetchCertificates()">Show certificates</button>
+                    <button mat-raised-button color="primary" [disabled]="!keyStoreForm.valid"
+                        (click)="fetchCertificates()">Show certificates</button>
                 </div>
                 <div class="col-3" align="end">
                     <button mat-raised-button color="primary" (click)="openTemplatesDialog()">Create new
@@ -67,7 +68,8 @@
                 <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
                 <td mat-cell *matCellDef="let element">
                     <button mat-raised-button color="primary" (click)="viewDetails(element)">Details</button>
-                    <button mat-raised-button class="download-btn ml-2 mr-2" (click)="download()">Download</button>
+                    <button mat-raised-button class="download-btn ml-2 mr-2"
+                        (click)="download(element)">Download</button>
                     <button mat-raised-button color="warn" (click)="revoke(element)">Revoke</button>
                 </td>
             </ng-container>

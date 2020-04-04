@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 public class CertificateDTO {
 
-    private BigInteger serialNumber;
+    private String serialNumber;
 
     @NotNull
     private EntityDTO subject;
@@ -41,11 +41,11 @@ public class CertificateDTO {
 
     }
 
-    public BigInteger getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(BigInteger serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
