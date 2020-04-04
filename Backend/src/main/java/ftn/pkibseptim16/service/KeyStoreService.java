@@ -19,7 +19,12 @@ public interface KeyStoreService {
     PublicKey getPublicKey(CertificateRole certificateRole, String keyStorePassword, String alias)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
-    List<CertificateDTO> getCertificates(String role,String keyStorePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    Certificate getCertificate(CertificateRole certificateRole, String keyStorePassword, String alias) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
-    List<CertificateDTO> getCACertificates(String rootKeyStoragePassword,String intermediateKeyStoragePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    List<CertificateDTO> getCertificates(String role, String keyStorePassword)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
+    List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
 }

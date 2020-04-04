@@ -1,10 +1,7 @@
 package ftn.pkibseptim16.serviceImpl;
 
 import com.google.common.primitives.Longs;
-import ftn.pkibseptim16.dto.CertificateDTO;
-import ftn.pkibseptim16.dto.CreateCertificateDTO;
-import ftn.pkibseptim16.dto.CreatedCertificateDTO;
-import ftn.pkibseptim16.dto.KeyUsageDTO;
+import ftn.pkibseptim16.dto.*;
 import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.model.Entity;
 import ftn.pkibseptim16.model.IssuerData;
@@ -12,25 +9,22 @@ import ftn.pkibseptim16.model.SubjectData;
 import ftn.pkibseptim16.repository.EntityRepository;
 import ftn.pkibseptim16.service.CertificateService;
 import ftn.pkibseptim16.service.KeyStoreService;
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.DigestCalculator;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
@@ -68,8 +62,8 @@ public class CertificateServiceImpl implements CertificateService {
 
         X509Certificate cert = generateCertificate(subjectData, issuerData, validFrom, validTo, certificateDTO);
 
-        keyStoreService.store(createCertificateDTO.getKeyStorePassword(),createCertificateDTO.getAlias(),subjectData.getPrivateKey(),
-                createCertificateDTO.getPrivateKeyPassword(),cert);
+        keyStoreService.store(createCertificateDTO.getKeyStorePassword(), createCertificateDTO.getAlias(), subjectData.getPrivateKey(),
+                createCertificateDTO.getPrivateKeyPassword(), cert);
         return new CreatedCertificateDTO(cert);
     }
 
@@ -79,7 +73,7 @@ public class CertificateServiceImpl implements CertificateService {
         Entity subject = entityRepository.getById(certificateDTO.getSubject().getId());
         CertificateDTO issuerCertificate = createCertificateDTO.getIssuerCertificate();
         Entity issuer = entityRepository.getById(issuerCertificate.getSubject().getId());
-        if(subject.getId() == issuer.getId()){
+        if (subject.getId() == issuer.getId()) {
             throw new BadCredentialsException("Issuer and subject is the same entity.");
         }
 
@@ -92,18 +86,37 @@ public class CertificateServiceImpl implements CertificateService {
         //proveri da li je vreme ok
         //dodaj proveru da li se ekstenzije poklapaju
         //dodaj proveru da li je sertifikat kojim zelis da potpises validan
-        if(!certificateDataIsValid(certificateDTO,issuerCertificate,validFrom,validTo)){
+        if (!certificateDataIsValid(certificateDTO, issuerCertificate, validFrom, validTo)) {
             throw new BadCredentialsException("Certificate is invalid");
         }
         SubjectData subjectData = getSubject(subject);
 
-        IssuerData issuerData = getIssuer( issuer,  issuerCertificate, createCertificateDTO.getIssuerKeyStorePassword(), createCertificateDTO.getIssuerPrivateKeyPassword());
+        IssuerData issuerData = getIssuer(issuer, issuerCertificate, createCertificateDTO.getIssuerKeyStorePassword(), createCertificateDTO.getIssuerPrivateKeyPassword());
 
         X509Certificate cert = generateCertificate(subjectData, issuerData, validFrom, validTo, certificateDTO);
 
-        keyStoreService.store(createCertificateDTO.getKeyStorePassword(),createCertificateDTO.getAlias(),subjectData.getPrivateKey(),
-                createCertificateDTO.getPrivateKeyPassword(),cert);
+        keyStoreService.store(createCertificateDTO.getKeyStorePassword(), createCertificateDTO.getAlias(), subjectData.getPrivateKey(),
+                createCertificateDTO.getPrivateKeyPassword(), cert);
         return new CreatedCertificateDTO(cert);
+    }
+
+    @Override
+    public void download(DownloadCertificateDTO downloadCertDTO)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        String certRoleStr = downloadCertDTO.getCertRole().toLowerCase();
+        String alias = downloadCertDTO.getAlias();
+        CertificateRole certRole = downloadCertDTO.returnCertRoleToEnum();
+        if (certRole == null) {
+            throw new NullPointerException("Undefined certificate role.");
+        }
+
+        Certificate certificate = keyStoreService.getCertificate(certRole, downloadCertDTO.getKeyStorePassword(), alias);
+
+        FileOutputStream os = new FileOutputStream(System.getProperty("user.home") + "/" + certRoleStr + "_" + alias + ".cer");
+        os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
+        os.write(Base64.encodeBase64(certificate.getEncoded(), true));
+        os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));
+        os.close();
     }
 
     private SubjectData getSubject(Entity entity) {
@@ -119,16 +132,17 @@ public class CertificateServiceImpl implements CertificateService {
         return new IssuerData(subjectData.getX500name(), subjectData.getPrivateKey(), subjectData.getPublicKey(), subjectData.getId());
     }
 
-    private IssuerData getIssuer(Entity issuer, CertificateDTO issuerCertificate,String keyStorePassword,String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    private IssuerData getIssuer(Entity issuer, CertificateDTO issuerCertificate, String keyStorePassword, String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         X500Name x500Name = getX500Name(issuer);
         CertificateRole certificateRole = CertificateRole.INTERMEDIATE;
-        if(issuerCertificate.getSubject().getId() == issuerCertificate.getIssuer().getId()){
+        if (issuerCertificate.getSubject().getId() == issuerCertificate.getIssuer().getId()) {
             certificateRole = CertificateRole.ROOT;
         }
-        PrivateKey privateKey = keyStoreService.getPrivateKey(certificateRole,keyStorePassword,issuerCertificate.getAlias(),issuerPrivateKeyPassword);
-        PublicKey publicKey = keyStoreService.getPublicKey(certificateRole,keyStorePassword,issuerCertificate.getAlias());
+        PrivateKey privateKey = keyStoreService.getPrivateKey(certificateRole, keyStorePassword, issuerCertificate.getAlias(), issuerPrivateKeyPassword);
+        PublicKey publicKey = keyStoreService.getPublicKey(certificateRole, keyStorePassword, issuerCertificate.getAlias());
         return new IssuerData(x500Name, privateKey, publicKey, issuer.getId());
     }
+
     private KeyPair generateKeyPair() {
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", "SunEC");
@@ -153,7 +167,7 @@ public class CertificateServiceImpl implements CertificateService {
         builder.addRDN(BCStyle.C, entity.getCountryCode());
         if (entity.getType().toString() == "USER") {
             builder.addRDN(BCStyle.SURNAME, entity.getSurname());
-            builder.addRDN(BCStyle.GIVENNAME, entity.getSurname());
+            builder.addRDN(BCStyle.GIVENNAME, entity.getGivename());
             builder.addRDN(BCStyle.EmailAddress, entity.getEmail());
         } else {
             builder.addRDN(BCStyle.OU, entity.getOrganizationUnitName());
@@ -210,36 +224,36 @@ public class CertificateServiceImpl implements CertificateService {
     //proveri da li je vreme ok
     //dodaj proveru da li se ekstenzije poklapaju
     //DODAJ PROVERU DA LI JE SERTIFIKAT KOJIM ZELIS DA POTPUSES VALIDAN
-    private boolean certificateDataIsValid(CertificateDTO newCertificateDTO,CertificateDTO issuerCertificate, Date validFrom, Date validTo) throws ParseException {
+    private boolean certificateDataIsValid(CertificateDTO newCertificateDTO, CertificateDTO issuerCertificate, Date validFrom, Date validTo) throws ParseException {
 
-        if(validFrom.before(getDate(issuerCertificate.getValidFrom())) || validTo.after(getDate(issuerCertificate.getValidTo()))){
+        if (validFrom.before(getDate(issuerCertificate.getValidFrom())) || validTo.after(getDate(issuerCertificate.getValidTo()))) {
             return false;
         }
 
-        if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() == null ){
+        if (issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() == null) {
             return false;
         }
 
-        if(issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() == null ){
+        if (issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() == null) {
             return false;
         }
 
 
-        if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null){
+        if (issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null) {
             List<Integer> subjectFalseKeyUsages = newCertificateDTO.getKeyUsage().getFalseKeyUsageIdentifiers();
             List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().getFalseKeyUsageIdentifiers();
-            for (Integer identifier:issuerFalseKeyUsages) {
-                if(!subjectFalseKeyUsages.contains(identifier)){
+            for (Integer identifier : issuerFalseKeyUsages) {
+                if (!subjectFalseKeyUsages.contains(identifier)) {
                     return false;
                 }
             }
         }
 
-        if(issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() != null){
+        if (issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() != null) {
             List<KeyPurposeId> subjectFalseExtendedKeyUsages = newCertificateDTO.getExtendedKeyUsage().getFalseExtendedKeyUsageIdentifiers();
             List<KeyPurposeId> issuerFalseExtendedKeyUsages = issuerCertificate.getExtendedKeyUsage().getFalseExtendedKeyUsageIdentifiers();
-            for (KeyPurposeId identifier:issuerFalseExtendedKeyUsages) {
-                if(!subjectFalseExtendedKeyUsages.contains(identifier)){
+            for (KeyPurposeId identifier : issuerFalseExtendedKeyUsages) {
+                if (!subjectFalseExtendedKeyUsages.contains(identifier)) {
                     return false;
                 }
             }
@@ -249,8 +263,13 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private byte[] getSerialNumber() {
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[20];
+        SecureRandom random = null;
+        try {
+            random = SecureRandom.getInstance("Windows-PRNG");
+        } catch (NoSuchAlgorithmException e) {
+            random = new SecureRandom();
+        }
+        byte[] bytes = new byte[10];
         random.nextBytes(bytes);
         return bytes;
     }

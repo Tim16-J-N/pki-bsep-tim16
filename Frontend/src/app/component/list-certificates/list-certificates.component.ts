@@ -1,3 +1,4 @@
+import { DownloadCertificateComponent } from './../download-certificate/download-certificate.component';
 import { CertificateDetailsComponent } from './../certificate-details/certificate-details.component';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
@@ -54,8 +55,13 @@ export class ListCertificatesComponent implements OnInit {
     this.dialog.open(CertificateDetailsComponent, { data: cert });
   }
 
-  download(cert: Certificate) {
-
+  download() {
+    this.dialog.open(DownloadCertificateComponent, {
+      data: {
+        certRole: this.keyStoreForm.value.certRole,
+        keyStorePassword: this.keyStoreForm.value.keyStorePassword
+      }
+    });
   }
 
   revoke(cert: Certificate) {

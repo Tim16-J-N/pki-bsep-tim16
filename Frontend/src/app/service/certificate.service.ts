@@ -23,14 +23,10 @@ export class CertificateService {
 
     public getCACertificates(rootKeyStoragePassword, intermediateKeyStoragePassword): any {
         let params = new HttpParams();
-        console.log(rootKeyStoragePassword)
-        console.log(intermediateKeyStoragePassword)
         if (rootKeyStoragePassword != null) {
-            console.log("Haj")
             params = params.append('rootKeyStoragePassword', rootKeyStoragePassword);
         }
         if (intermediateKeyStoragePassword != null) {
-            console.log("Haj 4")
             params = params.append('intermediateKeyStoragePassword', intermediateKeyStoragePassword);
         }
 
@@ -43,9 +39,13 @@ export class CertificateService {
         params = params.append('role', keyStoreLevel);
         params = params.append('keyStorePassword', keyStorePassword);
 
-        return this.httpClient.get(this.url + '/all-from-keystore', {
+        return this.httpClient.get(this.url + '/all', {
             params: params
         });
+    }
+
+    public download(certRole: string, keyStorePassword: string, alias: string) {
+        return this.httpClient.post(this.url + "/download", { certRole, keyStorePassword, alias });
     }
 
 }

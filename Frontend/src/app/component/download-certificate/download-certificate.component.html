@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Download Certificate</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="downloadForm" class="form-full-width">
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Certificate alias" formControlName="alias">
+            <mat-error *ngIf="downloadForm.get('alias').errors && downloadForm.get('alias').errors['required']">
+                Certificate alias is required.
+            </mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="mb-1">
+    <button mat-raised-button color="primary" (click)="download()" [disabled]="!downloadForm.valid">Confirm</button>
+</mat-dialog-actions>
