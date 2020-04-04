@@ -72,4 +72,5 @@ export class ListCertificatesComponent implements OnInit {
     this.dialog.open(ChooseTemplateComponent);
   }
 
+
 }

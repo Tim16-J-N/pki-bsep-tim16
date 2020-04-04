@@ -8,6 +8,7 @@ import ftn.pkibseptim16.dto.KeyUsageDTO;
 import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.service.KeyStoreService;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.*;
@@ -33,7 +35,8 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     private final String END_ENTITY_KEYSTORE = "end_entity_keystore.pkcs12";
 
     @Override
-    public void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword, Certificate certificate)
+    public void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword,
+            Certificate certificate)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
         char[] keyPassArray = keyPassword.toCharArray();
         char[] keyStorePassArray = keyStorePassword.toCharArray();
@@ -41,13 +44,14 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         String keyStorePath = getKeyStorePath(certificateRole);
 
         KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
-        keyStore.setKeyEntry(alias, privateKey, keyPassArray, new Certificate[]{certificate});
+        keyStore.setKeyEntry(alias, privateKey, keyPassArray, new Certificate[] { certificate });
         keyStore.store(new FileOutputStream(keyStorePath), keyStorePassArray);
     }
 
     @Override
-    public PrivateKey getPrivateKey(CertificateRole certificateRole, String keyStorePassword, String alias, String keyPassword)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableKeyException {
+    public PrivateKey getPrivateKey(CertificateRole certificateRole, String keyStorePassword, String alias,
+            String keyPassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException,
+            UnrecoverableKeyException {
         char[] keyPassArray = keyPassword.toCharArray();
         String keyStorePath = getKeyStorePath(certificateRole);
 
@@ -56,7 +60,8 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     }
 
     @Override
-    public PublicKey getPublicKey(CertificateRole certificateRole, String keyStorePassword, String alias) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public PublicKey getPublicKey(CertificateRole certificateRole, String keyStorePassword, String alias)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         String keyStorePath = getKeyStorePath(certificateRole);
 
         KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
@@ -75,7 +80,8 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     }
 
     @Override
-    public List<CertificateDTO> getCertificates(String role, String keyStorePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public List<CertificateDTO> getCertificates(String role, String keyStorePassword)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         String keyStorePath = getKeyStorePath(getCertificateRole(role));
         KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
         int i = 0;
@@ -90,8 +96,10 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         return certificateDTOS;
     }
 
+    // DODAJ PROVERU DA LI JE SERTIFIKAT VALIDAN
     @Override
-    public List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         if (rootKeyStoragePassword.isEmpty() && intermediateKeyStoragePassword.isEmpty()) {
             throw new BadCredentialsException("You have to enter at least one of the passwords.");
         }
@@ -107,10 +115,19 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         return certificateDTOS;
     }
 
-    private List<CertificateDTO> loadCertificates(List<CertificateDTO> certificateDTOS, String keyStorePassword, String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    private List<CertificateDTO> loadCertificates(List<CertificateDTO> certificateDTOS, String keyStorePassword,
+            String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 
         String keyStorePath = getKeyStorePath(getCertificateRole(role));
-        KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
+        char[] keyStorePassArray = keyStorePassword.toCharArray();
+
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try {
+            keyStore.load(new FileInputStream(keyStorePath), keyStorePassArray);
+        } catch (FileNotFoundException e) {
+            return certificateDTOS;
+        }
+
         int i = 0;
         Enumeration<String> aliases = keyStore.aliases();
         while (aliases.hasMoreElements()) {
@@ -121,7 +138,8 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         return certificateDTOS;
     }
 
-    private CertificateDTO createCertificateDTO(X509Certificate x509Certificate, String alias) throws CertificateEncodingException, CertificateParsingException {
+    private CertificateDTO createCertificateDTO(X509Certificate x509Certificate, String alias)
+            throws CertificateEncodingException, CertificateParsingException {
         CertificateDTO certificateDTO = new CertificateDTO();
         certificateDTO.setSerialNumber(x509Certificate.getSerialNumber());
         X500Name x500name = new JcaX509CertificateHolder(x509Certificate).getSubject();
@@ -146,12 +164,13 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         certificateDTO.setValidFrom(dateFormat.format(x509Certificate.getNotBefore()));
         certificateDTO.setValidTo(dateFormat.format(x509Certificate.getNotAfter()));
+
         boolean[] keyUsage = x509Certificate.getKeyUsage();
-        if (keyUsage.length != 0) {
+        if (keyUsage != null) {
             certificateDTO.setKeyUsage(new KeyUsageDTO(x509Certificate.getKeyUsage()));
         }
         List<String> extendedKeyUsage = x509Certificate.getExtendedKeyUsage();
-        if (!extendedKeyUsage.isEmpty()) {
+        if (extendedKeyUsage != null && !extendedKeyUsage.isEmpty()) {
             certificateDTO.setExtendedKeyUsage(new ExtendedKeyUsageDTO(extendedKeyUsage));
         }
         certificateDTO.setAlias(alias);
@@ -182,11 +201,14 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         return keyStore;
     }
 
-    private CertificateRole getCertificateRole(Certificate cert) {
+    private CertificateRole getCertificateRole(Certificate cert) throws CertificateEncodingException {
         X509Certificate certificate = (X509Certificate) cert;
-        if (Arrays.equals(certificate.getSubjectUniqueID(), certificate.getIssuerUniqueID())) {
+        X500Name subject = new JcaX509CertificateHolder(certificate).getSubject();
+        X500Name issuer = new JcaX509CertificateHolder(certificate).getIssuer();
+        if (subject.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString()
+                .equals(issuer.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString())) {
             return CertificateRole.ROOT;
-        } else if (certificate.getBasicConstraints() != -1) {   // if path length is set, it's a CA certificate
+        } else if (certificate.getBasicConstraints() != -1) { // if path length is set, it's a CA certificate
             return CertificateRole.INTERMEDIATE;
         } else {
             return CertificateRole.END_ENTITY;
@@ -204,12 +226,15 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         }
     }
 
-    private Long booleanArrayToLong(boolean[] booleans) {
-        byte byteArray[] = new byte[booleans.length];
-        for (int i = 0; i < booleans.length; i++) {
-            byteArray[i] = (byte) (booleans[i] ? 1 : 0);
+    private long booleanArrayToLong(boolean[] attributes) {
+        char[] chars = new char[7];
+        Arrays.fill(chars, '0');
+        if (attributes != null) {
+            for (int i = 0; i < attributes.length; ++i) {
+                if (attributes[i])
+                    chars[i] = '1';
+            }
         }
-        long longValue = Longs.fromByteArray(byteArray);
-        return new Long(longValue);
+        return new BigInteger(new String(chars), 2).longValue();
     }
 }

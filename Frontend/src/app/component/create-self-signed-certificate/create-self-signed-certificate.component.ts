@@ -13,6 +13,7 @@ import { ValidatorFn, FormGroup, FormBuilder, FormControl, Validators } from '@a
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { Router } from '@angular/router';
 
 const TimeValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('validFrom').value;
@@ -40,7 +41,7 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
   selectedTemplate: Template;
 
   constructor(private toastr: ToastrService, private formBuilder: FormBuilder, public dialog: MatDialog, private subjectService: SubjectService,
-    private certificateService: CertificateService) { }
+    private certificateService: CertificateService, private router: Router) { }
 
   ngOnInit() {
     this.createCertificateFormSubject = this.formBuilder.group({
@@ -143,6 +144,7 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
         this.createCertificateFormSubject.reset();
         this.createCertificateInfoAboutKeyStorage.reset();
         this.toastr.success('Successfully created a new certificate.', 'Create certificate');
+        this.router.navigate(['/admin/certificates']);
       },
       () => {
         this.toastr.error('Error ', 'Create certificate');

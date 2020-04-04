@@ -24,4 +24,5 @@ export class Entity {
         this.localityName = localityName;
         this.state = state;
     }
+
 }

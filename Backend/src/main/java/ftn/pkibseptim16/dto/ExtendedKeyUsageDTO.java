@@ -112,7 +112,7 @@ public class ExtendedKeyUsageDTO {
     }
 
 
-    public KeyPurposeId[] getKeyPurposeIds() {
+    public KeyPurposeId[] methodKeyPurposeIds() {
         Boolean[] booleans = {serverAuth, clientAuth, codeSigning, emailProtection, timeStamping, ocspSigning};
         KeyPurposeId[] keyPurposeIds = {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_codeSigning,
                 KeyPurposeId.id_kp_emailProtection, KeyPurposeId.id_kp_timeStamping, KeyPurposeId.id_kp_OCSPSigning};
@@ -131,7 +131,7 @@ public class ExtendedKeyUsageDTO {
         return newKeyPurposeIds;
     }
 
-    public List<KeyPurposeId> getFalseExtendedKeyUsageIdentifiers() {
+    public List<KeyPurposeId> methodFalseExtendedKeyUsageIdentifiers() {
         Boolean[] booleans = {serverAuth, clientAuth, codeSigning, emailProtection, timeStamping, ocspSigning};
         KeyPurposeId[] keyPurposeIds = {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_codeSigning,
                 KeyPurposeId.id_kp_emailProtection, KeyPurposeId.id_kp_timeStamping, KeyPurposeId.id_kp_OCSPSigning};

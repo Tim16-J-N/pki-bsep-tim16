@@ -29,4 +29,6 @@ export class Certificate {
         this.extendedKeyUsage = extendedKeyUsage;
         this.alias = alias;
     }
+
+
 }

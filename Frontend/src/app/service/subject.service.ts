@@ -22,4 +22,8 @@ export class SubjectService {
         return this.httpClient.get(this.url + "/all");
     }
 
+    public getAllWithoutRootEntities(): any {
+        return this.httpClient.get(this.url);
+    }
+
 }
