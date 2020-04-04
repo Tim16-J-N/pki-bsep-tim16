@@ -284,8 +284,6 @@ export class CreateCertificateComponent implements OnInit {
   }
 
   setExtensionsAfterChoosingIssuer() {
-    console.log(this.selectedTemplate)
-    console.log(this.getSelectedIssuerCertificate().keyUsage)
     if (!this.getSelectedIssuerCertificate().keyUsage) {
       return;
     }

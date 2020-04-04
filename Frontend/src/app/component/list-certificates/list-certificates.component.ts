@@ -1,4 +1,3 @@
-
 import { CertificateDetailsComponent } from './../certificate-details/certificate-details.component';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
