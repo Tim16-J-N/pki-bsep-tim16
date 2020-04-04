@@ -1,6 +1,5 @@
 package ftn.pkibseptim16.serviceImpl;
 
-import com.google.common.primitives.Longs;
 import ftn.pkibseptim16.dto.CertificateDTO;
 import ftn.pkibseptim16.dto.EntityDTO;
 import ftn.pkibseptim16.dto.ExtendedKeyUsageDTO;
@@ -36,21 +35,21 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
     @Override
     public void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword,
-            Certificate certificate)
+                      Certificate[] certificateChain)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
         char[] keyPassArray = keyPassword.toCharArray();
         char[] keyStorePassArray = keyStorePassword.toCharArray();
-        CertificateRole certificateRole = getCertificateRole(certificate);
+        CertificateRole certificateRole = getCertificateRole(certificateChain[0]);
         String keyStorePath = getKeyStorePath(certificateRole);
 
         KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
-        keyStore.setKeyEntry(alias, privateKey, keyPassArray, new Certificate[] { certificate });
+        keyStore.setKeyEntry(alias, privateKey, keyPassArray, certificateChain);
         keyStore.store(new FileOutputStream(keyStorePath), keyStorePassArray);
     }
 
     @Override
     public PrivateKey getPrivateKey(CertificateRole certificateRole, String keyStorePassword, String alias,
-            String keyPassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException,
+                                    String keyPassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException,
             UnrecoverableKeyException {
         char[] keyPassArray = keyPassword.toCharArray();
         String keyStorePath = getKeyStorePath(certificateRole);
@@ -77,6 +76,16 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
         Certificate certificate = keyStore.getCertificate(alias);
         return certificate;
+    }
+
+    @Override
+    public Certificate[] getCertificateChain(CertificateRole certificateRole, String keyStorePassword, String alias)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        String keyStorePath = getKeyStorePath(certificateRole);
+
+        KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
+        Certificate[] certificateChain = keyStore.getCertificateChain(alias);
+        return certificateChain;
     }
 
     @Override
@@ -116,7 +125,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     }
 
     private List<CertificateDTO> loadCertificates(List<CertificateDTO> certificateDTOS, String keyStorePassword,
-            String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+                                                  String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 
         String keyStorePath = getKeyStorePath(getCertificateRole(role));
         char[] keyStorePassArray = keyStorePassword.toCharArray();
@@ -154,7 +163,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         if (x509Certificate.getExtensionValue("2.5.29.35") != null) {
             certificateDTO.setAuthorityKeyIdentifier(true);
         }
-        if (x509Certificate.getExtensionValue("2.5.29.14")  != null) {
+        if (x509Certificate.getExtensionValue("2.5.29.14") != null) {
             certificateDTO.setSubjectKeyIdentifier(true);
         }
         if (x509Certificate.getBasicConstraints() != -1) {
@@ -200,6 +209,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
         return keyStore;
     }
+
 
     private CertificateRole getCertificateRole(Certificate cert) throws CertificateEncodingException {
         X509Certificate certificate = (X509Certificate) cert;

@@ -10,7 +10,7 @@ import java.security.cert.CertificateException;
 import java.util.List;
 
 public interface KeyStoreService {
-    void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword, Certificate certificate)
+    void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword, Certificate[] certificateChain)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
 
     PrivateKey getPrivateKey(CertificateRole certificateRole, String keyStorePassword, String alias, String keyPassword)
@@ -26,5 +26,7 @@ public interface KeyStoreService {
 
     List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
+    Certificate[] getCertificateChain(CertificateRole certificateRole, String keyStorePassword, String alias) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
 }

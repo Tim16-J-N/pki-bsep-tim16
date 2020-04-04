@@ -34,10 +34,7 @@ import java.security.spec.ECGenParameterSpec;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -65,7 +62,7 @@ public class CertificateServiceImpl implements CertificateService {
         X509Certificate cert = generateCertificate(subjectData, issuerData, validFrom, validTo, certificateDTO);
 
         keyStoreService.store(createCertificateDTO.getKeyStorePassword(), createCertificateDTO.getAlias(),
-                subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), cert);
+                subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), new Certificate[]{cert});
         subject.setNumberOfRootCertificates(subject.getNumberOfRootCertificates() + 1);
         entityRepository.save(subject);
         return new CreatedCertificateDTO(cert);
@@ -95,13 +92,18 @@ public class CertificateServiceImpl implements CertificateService {
         }
         SubjectData subjectData = getSubject(subject);
 
-        IssuerData issuerData = getIssuer(issuer, issuerCertificate, createCertificateDTO.getIssuerKeyStorePassword(),
+        String issuerKeyStorePassword = createCertificateDTO.getIssuerKeyStorePassword();
+        IssuerData issuerData = getIssuer(issuer, issuerCertificate, issuerKeyStorePassword,
                 createCertificateDTO.getIssuerPrivateKeyPassword());
+
+        CertificateRole certificateRole = getCertificateRole(issuerCertificate);
 
         X509Certificate cert = generateCertificate(subjectData, issuerData, validFrom, validTo, certificateDTO);
 
+        Certificate[] newCertificateChain = getCertificateChain(certificateRole, issuerKeyStorePassword,
+                issuerCertificate.getAlias(), cert);
         keyStoreService.store(createCertificateDTO.getKeyStorePassword(), createCertificateDTO.getAlias(),
-                subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), cert);
+                subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), newCertificateChain);
         return new CreatedCertificateDTO(cert);
     }
 
@@ -125,6 +127,20 @@ public class CertificateServiceImpl implements CertificateService {
         os.close();
     }
 
+    private Certificate[] getCertificateChain(CertificateRole certificateRole, String issuerKeyStorePassword,
+                                              String alias, Certificate cert) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        Certificate[] certificateChain = keyStoreService.getCertificateChain(certificateRole, issuerKeyStorePassword,
+                alias);
+        List<Certificate> certificateList = new ArrayList<>(Arrays.asList(certificateChain));
+        certificateList.add(0, cert);
+
+        Certificate[] newCertificates = new Certificate[certificateList.size()];
+        for (int i = 0; i < certificateList.size(); i++)
+            newCertificates[i] = certificateList.get(i);
+
+        return newCertificates;
+    }
+
     private SubjectData getSubject(Entity entity) {
         KeyPair keyPairSubject = generateKeyPair();
         if (keyPairSubject == null) {
@@ -143,10 +159,7 @@ public class CertificateServiceImpl implements CertificateService {
                                  String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException,
             NoSuchAlgorithmException, KeyStoreException, IOException {
         X500Name x500Name = getX500Name(issuer);
-        CertificateRole certificateRole = CertificateRole.INTERMEDIATE;
-        if (issuerCertificate.getSubject().getCommonName().equals(issuerCertificate.getIssuer().getCommonName())) {
-            certificateRole = CertificateRole.ROOT;
-        }
+        CertificateRole certificateRole = getCertificateRole(issuerCertificate);
         PrivateKey privateKey = keyStoreService.getPrivateKey(certificateRole, keyStorePassword,
                 issuerCertificate.getAlias(), issuerPrivateKeyPassword);
         PublicKey publicKey = keyStoreService.getPublicKey(certificateRole, keyStorePassword,
@@ -206,7 +219,7 @@ public class CertificateServiceImpl implements CertificateService {
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256withECDSA");
         builder = builder.setProvider("BC");
         ContentSigner contentSigner = builder.build(issuerData.getPrivateKey());
-        BigInteger serialNumber = new BigInteger(1,getSerialNumber());
+        BigInteger serialNumber = new BigInteger(1, getSerialNumber());
         X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuerData.getX500name(), serialNumber,
                 validFrom, validTo, subjectData.getX500name(), subjectData.getPublicKey());
 
@@ -311,5 +324,13 @@ public class CertificateServiceImpl implements CertificateService {
             bits[i] = cArray[i] == '1';
         }
         return bits;
+    }
+
+    private CertificateRole getCertificateRole(CertificateDTO certificateDTO) {
+        CertificateRole certificateRole = CertificateRole.INTERMEDIATE;
+        if (certificateDTO.getSubject().getCommonName().equals(certificateDTO.getIssuer().getCommonName())) {
+            certificateRole = CertificateRole.ROOT;
+        }
+        return certificateRole;
     }
 }
