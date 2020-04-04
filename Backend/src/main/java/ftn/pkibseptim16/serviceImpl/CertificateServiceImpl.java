@@ -1,6 +1,5 @@
 package ftn.pkibseptim16.serviceImpl;
 
-import com.google.common.primitives.Longs;
 import ftn.pkibseptim16.dto.*;
 import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.model.Entity;
@@ -28,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
@@ -141,7 +141,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private IssuerData getIssuer(Entity issuer, CertificateDTO issuerCertificate, String keyStorePassword,
-            String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException,
+                                 String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException,
             NoSuchAlgorithmException, KeyStoreException, IOException {
         X500Name x500Name = getX500Name(issuer);
         CertificateRole certificateRole = CertificateRole.INTERMEDIATE;
@@ -202,7 +202,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Date validFrom,
-            Date validTo, CertificateDTO certificateDTO) throws Exception {
+                                                Date validTo, CertificateDTO certificateDTO) throws Exception {
 
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256withECDSA");
         builder = builder.setProvider("BC");
@@ -248,7 +248,7 @@ public class CertificateServiceImpl implements CertificateService {
     // dodaj proveru da li se ekstenzije poklapaju
     // DODAJ PROVERU DA LI JE SERTIFIKAT KOJIM ZELIS DA POTPUSES VALIDAN
     private boolean certificateDataIsValid(CertificateDTO newCertificateDTO, CertificateDTO issuerCertificate,
-            Date validFrom, Date validTo) throws ParseException {
+                                           Date validFrom, Date validTo) throws ParseException {
 
         if (validFrom.before(getDate(issuerCertificate.getValidFrom()))
                 || validTo.after(getDate(issuerCertificate.getValidTo()))) {
