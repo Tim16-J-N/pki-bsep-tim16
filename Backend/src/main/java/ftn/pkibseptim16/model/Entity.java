@@ -40,8 +40,11 @@ public class Entity {
     @Column(columnDefinition = "VARCHAR(64)")
     private String state;
 
-    public Entity(){
+    @Column
+    private Integer numberOfRootCertificates;
 
+    public Entity(){
+        this.numberOfRootCertificates = 0;
     }
     public Entity(EntityType type, String commonName, String email,
                   String organizationUnitName, String organization, String countryCode, String surname, String givename, String localityName, String state) {
@@ -64,6 +67,7 @@ public class Entity {
             this.surname = "";
             this.givename = "";
         }
+        this.numberOfRootCertificates = 0;
     }
 
     public Long getId() {
@@ -152,5 +156,13 @@ public class Entity {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public Integer getNumberOfRootCertificates() {
+        return numberOfRootCertificates;
+    }
+
+    public void setNumberOfRootCertificates(Integer numberOfRootCertificates) {
+        this.numberOfRootCertificates = numberOfRootCertificates;
     }
 }

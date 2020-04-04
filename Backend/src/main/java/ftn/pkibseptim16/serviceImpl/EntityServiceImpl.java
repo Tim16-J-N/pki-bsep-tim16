@@ -35,6 +35,11 @@ public class EntityServiceImpl implements EntityService {
         return convertToDTO(entityRepository.findAll());
     }
 
+    @Override
+    public List<EntityDTO> getAllWithoutRootEntities() {
+        return convertToDTO(entityRepository.findByNumberOfRootCertificatesEquals(0));
+    }
+
     private List<EntityDTO> convertToDTO(List<Entity> entities){
         List<EntityDTO> entityDTOS =new ArrayList<>();
         for (Entity entity:entities) {

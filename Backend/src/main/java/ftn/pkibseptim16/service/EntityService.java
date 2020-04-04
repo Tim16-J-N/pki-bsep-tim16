@@ -9,4 +9,6 @@ public interface EntityService {
     EntityDTO createSubject(EntityDTO entityDTO) throws IllegalArgumentException, BadCredentialsException;
 
     List<EntityDTO> getAll();
+
+    List<EntityDTO> getAllWithoutRootEntities();
 }

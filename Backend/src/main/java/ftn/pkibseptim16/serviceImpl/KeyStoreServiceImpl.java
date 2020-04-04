@@ -17,9 +17,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -142,8 +144,10 @@ public class KeyStoreServiceImpl implements KeyStoreService {
             certificateDTO.setSubjectIsCa(true);
         }
 
-        certificateDTO.setValidFrom(x509Certificate.getNotBefore().toString());
-        certificateDTO.setValidTo(x509Certificate.getNotAfter().toString());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        certificateDTO.setValidFrom(dateFormat.format(x509Certificate.getNotBefore()));
+        certificateDTO.setValidTo(dateFormat.format(x509Certificate.getNotAfter()));
+
         boolean[] keyUsage = x509Certificate.getKeyUsage();
         if(keyUsage != null){
             certificateDTO.setKeyUsage(new KeyUsageDTO(x509Certificate.getKeyUsage()));
@@ -202,7 +206,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
                 return END_ENTITY_KEYSTORE;
         }
     }
-
+/*
     private Long booleanArrayToLong(boolean[] booleans){
         byte byteArray[] = new byte[booleans.length];
         for (int i = 0; i < booleans.length; i++) {
@@ -210,5 +214,17 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         }
         long longValue = Longs.fromByteArray(byteArray);
         return new Long(longValue);
+    }*/
+
+    private long booleanArrayToLong( boolean[] attributes ){
+        char[] chars = new char[7];
+        Arrays.fill(chars, '0');
+        if(attributes != null){
+            for (int i = 0; i < attributes.length; ++i) {
+                if(attributes[i])
+                    chars[i] = '1';
+            }
+        }
+        return new BigInteger(new String(chars),2).longValue();
     }
 }

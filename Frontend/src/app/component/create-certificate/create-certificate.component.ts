@@ -91,9 +91,58 @@ export class CreateCertificateComponent implements OnInit {
 
 
   getSubjects(): void {
-    this.subjectService.getAll().subscribe((subjects: Entity[]) => {
+    this.subjectService.getAllWithoutRootEntities().subscribe((subjects: Entity[]) => {
       this.subjects = subjects;
     })
+  }
+
+  getKeyUsages(issuerCertificate: Certificate): string {
+    if (!issuerCertificate.keyUsage) {
+      return " (certS, crlS, dataE, decO, digS, encO, keyAgr, keyE, nonRep)";
+    }
+    var keyUsages = '(';
+    if (issuerCertificate.keyUsage.certificateSigning) {
+      keyUsages += 'certS, ';
+    }
+    if (issuerCertificate.keyUsage.crlSign) {
+      keyUsages += 'crlS, ';
+    }
+
+    if (issuerCertificate.keyUsage.dataEncipherment) {
+      keyUsages += 'dataE, ';
+    }
+
+    if (issuerCertificate.keyUsage.decipherOnly) {
+      keyUsages += 'decO, ';
+    }
+
+    if (issuerCertificate.keyUsage.digitalSignature) {
+      keyUsages += 'digS, ';
+    }
+
+    if (issuerCertificate.keyUsage.enchiperOnly) {
+      keyUsages += 'encO, ';
+    }
+
+    if (issuerCertificate.keyUsage.keyAgreement) {
+      keyUsages += 'keyAgr, ';
+    }
+
+    if (issuerCertificate.keyUsage.keyEncipherment) {
+      keyUsages += 'keyE, ';
+    }
+
+    if (issuerCertificate.keyUsage.nonRepudiation) {
+      keyUsages += 'nonRep, ';
+    }
+    if (keyUsages.length == 1) {
+      return '';
+    }
+
+    keyUsages = keyUsages.substring(0, keyUsages.length - 2);
+    keyUsages += ')';
+
+    return keyUsages;
   }
 
   functionForCreatingFormCertificateInfoAboutKeyStorage() {

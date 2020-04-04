@@ -42,4 +42,11 @@ public class EntityController {
     public ResponseEntity<List<EntityDTO>> getAll() {
         return new ResponseEntity<>(entityService.getAll(), HttpStatus.OK);
     }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EntityDTO>> getAllWithoutRootEntities() {
+        return new ResponseEntity<>(entityService.getAllWithoutRootEntities(), HttpStatus.OK);
+    }
+
 }

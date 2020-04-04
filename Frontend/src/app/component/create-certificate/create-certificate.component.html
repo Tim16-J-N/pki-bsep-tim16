@@ -124,13 +124,14 @@
                 </form>
                 <form [formGroup]="createCertificateFormIssuer">
                     <ng-template matStepLabel>Issuer</ng-template>
-                    <mat-form-field class="form-full-width" class="col-8">
+                    <mat-form-field class="form-full-width">
                         <mat-label>Choose existing issuer</mat-label>
                         <mat-select formControlName="selectedIssuerCertificate">
                             <mat-option *ngFor="let issuerCertificate of issuerCertificates"
                                 [value]="issuerCertificate">
                                 CN={{issuerCertificate.subject.commonName}},
                                 O={{issuerCertificate.subject.organization}}
+                                {{ getKeyUsages(issuerCertificate)}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>

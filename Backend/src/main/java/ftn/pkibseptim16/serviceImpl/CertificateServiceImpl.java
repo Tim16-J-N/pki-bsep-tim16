@@ -35,6 +35,7 @@ import java.security.spec.ECGenParameterSpec;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +67,8 @@ public class CertificateServiceImpl implements CertificateService {
 
         keyStoreService.store(createCertificateDTO.getKeyStorePassword(),createCertificateDTO.getAlias(),subjectData.getPrivateKey(),
                 createCertificateDTO.getPrivateKeyPassword(),cert);
+        subject.setNumberOfRootCertificates(  subject.getNumberOfRootCertificates()+1);
+        entityRepository.save(subject);
         return new CreatedCertificateDTO(cert);
     }
 
@@ -221,15 +224,6 @@ public class CertificateServiceImpl implements CertificateService {
             return false;
         }
 
-        if(issuerCertificate.getKeyUsage() != null && !newCertificateDTO.getKeyUsage().isEnabled()){
-            return false;
-        }
-
-        if(issuerCertificate.getExtendedKeyUsage() != null && !newCertificateDTO.getExtendedKeyUsage().isEnabled()){
-            return false;
-        }
-
-
         if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null){
             List<Integer> subjectFalseKeyUsages = newCertificateDTO.getKeyUsage().methodFalseKeyUsageIdentifiers();
             List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().methodFalseKeyUsageIdentifiers();
@@ -260,13 +254,34 @@ public class CertificateServiceImpl implements CertificateService {
         return bytes;
     }
 
-    private boolean[] toBooleanArray(Long number) {
+   /* private boolean[] toBooleanArray(Long number) {
         byte[] bytes = Longs.toByteArray(number);
         boolean[] booleans = new boolean[bytes.length];
         for (int i = 0; i < bytes.length; i++) {
             booleans[i] = bytes[i] != 0;
         }
-
         return booleans;
+    }
+*/
+    private  boolean[] toBooleanArray(Long value) {
+
+        char[] cArray = new char[7];
+        Arrays.fill(cArray, '0');
+        if(value != -1) {
+            char[] chars = Long.toBinaryString(value).toCharArray();
+
+            int offset = 0;
+            if (chars.length < cArray.length) {
+                offset = cArray.length - chars.length;
+            }
+
+            System.arraycopy(chars, 0, cArray, offset, chars.length);
+
+        }
+        boolean[] bits = new boolean[cArray.length];
+        for(int i = 0; i < cArray.length; i++) {
+            bits[i] = cArray[i] == '1';
+        }
+        return bits;
     }
 }

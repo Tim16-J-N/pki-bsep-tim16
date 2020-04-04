@@ -9,5 +9,5 @@ public interface EntityRepository extends JpaRepository<Entity, Long> {
     Entity findByEmail(String email);
     Entity findByCommonName(String commonName);
     List<Entity> findAll();
-
+    List<Entity> findByNumberOfRootCertificatesEquals(Integer number);
 }

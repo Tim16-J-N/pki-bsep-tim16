@@ -23,4 +23,6 @@ export class KeyUsage {
         this.keyEncipherment = keyEncipherment;
         this.nonRepudiation = nonRepudiation;
     }
+
+
 }
