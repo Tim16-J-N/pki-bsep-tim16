@@ -25,7 +25,9 @@ public class CreateCertificateDTO {
 
     private String issuerPrivateKeyPassword;
 
+    public CreateCertificateDTO(){
 
+    }
     public String getAlias() {
         return alias;
     }

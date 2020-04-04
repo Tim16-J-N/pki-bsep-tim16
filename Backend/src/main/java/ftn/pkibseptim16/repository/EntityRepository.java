@@ -8,6 +8,6 @@ import java.util.List;
 public interface EntityRepository extends JpaRepository<Entity, Long> {
     Entity findByEmail(String email);
     Entity findByCommonName(String commonName);
-    Entity getById(Long id);
     List<Entity> findAll();
+
 }

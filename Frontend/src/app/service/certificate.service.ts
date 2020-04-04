@@ -23,14 +23,10 @@ export class CertificateService {
 
     public getCACertificates(rootKeyStoragePassword, intermediateKeyStoragePassword): any {
         let params = new HttpParams();
-        console.log(rootKeyStoragePassword)
-        console.log(intermediateKeyStoragePassword)
         if (rootKeyStoragePassword != null) {
-            console.log("Haj")
             params = params.append('rootKeyStoragePassword', rootKeyStoragePassword);
         }
         if (intermediateKeyStoragePassword != null) {
-            console.log("Haj 4")
             params = params.append('intermediateKeyStoragePassword', intermediateKeyStoragePassword);
         }
 

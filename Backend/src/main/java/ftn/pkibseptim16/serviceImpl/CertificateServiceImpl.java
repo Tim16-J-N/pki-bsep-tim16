@@ -12,20 +12,15 @@ import ftn.pkibseptim16.model.SubjectData;
 import ftn.pkibseptim16.repository.EntityRepository;
 import ftn.pkibseptim16.service.CertificateService;
 import ftn.pkibseptim16.service.KeyStoreService;
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.DigestCalculator;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,14 +29,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -55,7 +51,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws Exception {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
-        Entity subject = entityRepository.getById(certificateDTO.getSubject().getId());
+        Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
 
         Date validFrom = getDate(certificateDTO.getValidFrom());
         Date validTo = getDate(certificateDTO.getValidTo());
@@ -76,24 +72,24 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public CreatedCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws Exception {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
-        Entity subject = entityRepository.getById(certificateDTO.getSubject().getId());
+        Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
         CertificateDTO issuerCertificate = createCertificateDTO.getIssuerCertificate();
-        Entity issuer = entityRepository.getById(issuerCertificate.getSubject().getId());
-        if(subject.getId() == issuer.getId()){
-            throw new BadCredentialsException("Issuer and subject is the same entity.");
+        Entity issuer = entityRepository.findByCommonName(issuerCertificate.getSubject().getCommonName());
+        if(subject.getCommonName().equals(issuer.getCommonName())){
+            throw new IllegalArgumentException("Issuer and subject is the same entity.");
         }
 
         Date validFrom = getDate(certificateDTO.getValidFrom());
         Date validTo = getDate(certificateDTO.getValidTo());
         if (validFrom.before(new Date()) || validFrom.after(validTo)) {
-            throw new BadCredentialsException("Start date of validity period must be before end date.");
+            throw new IllegalArgumentException("Start date of validity period must be before end date.");
         }
 
         //proveri da li je vreme ok
         //dodaj proveru da li se ekstenzije poklapaju
         //dodaj proveru da li je sertifikat kojim zelis da potpises validan
         if(!certificateDataIsValid(certificateDTO,issuerCertificate,validFrom,validTo)){
-            throw new BadCredentialsException("Certificate is invalid");
+            throw new IllegalArgumentException("Certificate is invalid");
         }
         SubjectData subjectData = getSubject(subject);
 
@@ -122,7 +118,7 @@ public class CertificateServiceImpl implements CertificateService {
     private IssuerData getIssuer(Entity issuer, CertificateDTO issuerCertificate,String keyStorePassword,String issuerPrivateKeyPassword) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         X500Name x500Name = getX500Name(issuer);
         CertificateRole certificateRole = CertificateRole.INTERMEDIATE;
-        if(issuerCertificate.getSubject().getId() == issuerCertificate.getIssuer().getId()){
+        if(issuerCertificate.getSubject().getCommonName().equals(issuerCertificate.getIssuer().getCommonName())){
             certificateRole = CertificateRole.ROOT;
         }
         PrivateKey privateKey = keyStoreService.getPrivateKey(certificateRole,keyStorePassword,issuerCertificate.getAlias(),issuerPrivateKeyPassword);
@@ -153,7 +149,7 @@ public class CertificateServiceImpl implements CertificateService {
         builder.addRDN(BCStyle.C, entity.getCountryCode());
         if (entity.getType().toString() == "USER") {
             builder.addRDN(BCStyle.SURNAME, entity.getSurname());
-            builder.addRDN(BCStyle.GIVENNAME, entity.getSurname());
+            builder.addRDN(BCStyle.GIVENNAME, entity.getGivename());
             builder.addRDN(BCStyle.EmailAddress, entity.getEmail());
         } else {
             builder.addRDN(BCStyle.OU, entity.getOrganizationUnitName());
@@ -164,9 +160,18 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private Date getDate(String date) throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        return df.parse(date);
+        try{
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+            return df.parse(date);
+        }catch (ParseException e){
+            DateFormat dateFormat = new SimpleDateFormat(
+                    "EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+            return dateFormat.parse(date);
+        }
+
     }
+
 
     private X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Date validFrom, Date validTo,
                                                 CertificateDTO certificateDTO) throws Exception {
@@ -199,7 +204,7 @@ public class CertificateServiceImpl implements CertificateService {
             certGen.addExtension(Extension.keyUsage, true, keyUsage);
         }
         if (certificateDTO.getExtendedKeyUsage().isEnabled()) {
-            ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(certificateDTO.getExtendedKeyUsage().getKeyPurposeIds());
+            ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(certificateDTO.getExtendedKeyUsage().methodKeyPurposeIds());
             certGen.addExtension(Extension.extendedKeyUsage, true, extendedKeyUsage);
         }
 
@@ -216,18 +221,18 @@ public class CertificateServiceImpl implements CertificateService {
             return false;
         }
 
-        if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() == null ){
+        if(issuerCertificate.getKeyUsage() != null && !newCertificateDTO.getKeyUsage().isEnabled()){
             return false;
         }
 
-        if(issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() == null ){
+        if(issuerCertificate.getExtendedKeyUsage() != null && !newCertificateDTO.getExtendedKeyUsage().isEnabled()){
             return false;
         }
 
 
         if(issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null){
-            List<Integer> subjectFalseKeyUsages = newCertificateDTO.getKeyUsage().getFalseKeyUsageIdentifiers();
-            List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().getFalseKeyUsageIdentifiers();
+            List<Integer> subjectFalseKeyUsages = newCertificateDTO.getKeyUsage().methodFalseKeyUsageIdentifiers();
+            List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().methodFalseKeyUsageIdentifiers();
             for (Integer identifier:issuerFalseKeyUsages) {
                 if(!subjectFalseKeyUsages.contains(identifier)){
                     return false;
@@ -236,8 +241,8 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         if(issuerCertificate.getExtendedKeyUsage() != null && newCertificateDTO.getExtendedKeyUsage() != null){
-            List<KeyPurposeId> subjectFalseExtendedKeyUsages = newCertificateDTO.getExtendedKeyUsage().getFalseExtendedKeyUsageIdentifiers();
-            List<KeyPurposeId> issuerFalseExtendedKeyUsages = issuerCertificate.getExtendedKeyUsage().getFalseExtendedKeyUsageIdentifiers();
+            List<KeyPurposeId> subjectFalseExtendedKeyUsages = newCertificateDTO.getExtendedKeyUsage().methodFalseExtendedKeyUsageIdentifiers();
+            List<KeyPurposeId> issuerFalseExtendedKeyUsages = issuerCertificate.getExtendedKeyUsage().methodFalseExtendedKeyUsageIdentifiers();
             for (KeyPurposeId identifier:issuerFalseExtendedKeyUsages) {
                 if(!subjectFalseExtendedKeyUsages.contains(identifier)){
                     return false;

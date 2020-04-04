@@ -8,6 +8,7 @@ import ftn.pkibseptim16.dto.KeyUsageDTO;
 import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.service.KeyStoreService;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -79,6 +80,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         return certificateDTOS;
     }
 
+    //DODAJ PROVERU DA LI JE SERTIFIKAT VALIDAN
     @Override
     public List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         if(rootKeyStoragePassword.isEmpty() && intermediateKeyStoragePassword.isEmpty()){
@@ -99,7 +101,15 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     private  List<CertificateDTO> loadCertificates(List<CertificateDTO> certificateDTOS, String keyStorePassword,String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 
         String keyStorePath = getKeyStorePath(getCertificateRole(role));
-        KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
+        char[] keyStorePassArray = keyStorePassword.toCharArray();
+
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try {
+            keyStore.load(new FileInputStream(keyStorePath), keyStorePassArray);
+        } catch (FileNotFoundException e) {
+            return certificateDTOS;
+        }
+
         int i = 0;
         Enumeration<String> aliases = keyStore.aliases();
         while (aliases.hasMoreElements()) {
@@ -135,11 +145,11 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         certificateDTO.setValidFrom(x509Certificate.getNotBefore().toString());
         certificateDTO.setValidTo(x509Certificate.getNotAfter().toString());
         boolean[] keyUsage = x509Certificate.getKeyUsage();
-        if(keyUsage.length != 0){
+        if(keyUsage != null){
             certificateDTO.setKeyUsage(new KeyUsageDTO(x509Certificate.getKeyUsage()));
         }
         List<String> extendedKeyUsage = x509Certificate.getExtendedKeyUsage();
-        if(!extendedKeyUsage.isEmpty()){
+        if(extendedKeyUsage != null && !extendedKeyUsage.isEmpty()){
             certificateDTO.setExtendedKeyUsage(new ExtendedKeyUsageDTO(extendedKeyUsage));
         }
         certificateDTO.setAlias(alias);
@@ -169,9 +179,11 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         return keyStore;
     }
 
-    private CertificateRole getCertificateRole(Certificate cert) {
+    private CertificateRole getCertificateRole(Certificate cert) throws CertificateEncodingException {
         X509Certificate certificate = (X509Certificate) cert;
-        if (Arrays.equals(certificate.getSubjectUniqueID(), certificate.getIssuerUniqueID())) {
+        X500Name subject = new JcaX509CertificateHolder(certificate).getSubject();
+        X500Name issuer = new JcaX509CertificateHolder(certificate).getIssuer();
+        if (subject.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString().equals(issuer.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString())) {
             return CertificateRole.ROOT;
         } else if (certificate.getBasicConstraints() != -1) {   // if path length is set, it's a CA certificate
             return CertificateRole.INTERMEDIATE;

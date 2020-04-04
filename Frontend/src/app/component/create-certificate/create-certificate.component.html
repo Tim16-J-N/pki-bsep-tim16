@@ -96,104 +96,105 @@
                 </form>
             </mat-step>
 
-            <mat-step [stepControl]="createCertificateKeyStoragePasswords">
-                <form [formGroup]="createCertificateKeyStoragePasswords">
-                    <ng-template matStepLabel>Access info</ng-template>
-                    <mat-form-field class="field-width">
-                        <input matInput type="password" placeholder="Root Key Storage Password"
-                            formControlName="rootKeyStoragePassword">
-                    </mat-form-field>
-                    <br />
-                    <mat-form-field class="field-width">
-                        <input type="password" matInput formControlName="intermediateKeyStoragePassword"
-                            placeholder="Intermediate Key Storage Password">
-                    </mat-form-field>
-
-                    <mat-error class="date-err"
-                        *ngIf="createCertificateKeyStoragePasswords.errors && createCertificateKeyStoragePasswords.errors['validKeyStoragePasword']">
-                        Please enter at least one of the passwords.
-                    </mat-error>
-
-                    <div class="mt-3">
-                        <button mat-raised-button color="primary" class="mr-3" matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" (click)="getCACertificates()"
-                            [disabled]="!createCertificateKeyStoragePasswords.valid" matStepperNext>Next</button>
-                    </div>
-                </form>
-            </mat-step>
 
             <mat-step [stepControl]="createCertificateFormIssuer">
+                <form [formGroup]="createCertificateKeyStoragePasswords">
+                    <div class="row">
+                        <mat-form-field class="col-4">
+                            <input matInput type="password" placeholder="Root Key Storage Password"
+                                formControlName="rootKeyStoragePassword">
+                        </mat-form-field>
+                        <mat-form-field class="col-4">
+                            <input type="password" matInput formControlName="intermediateKeyStoragePassword"
+                                placeholder="Intermediate Key Storage Password">
+                        </mat-form-field>
+                        <div class="col-4" align="end">
+                            <button mat-raised-button color="primary"
+                                [disabled]="!createCertificateKeyStoragePasswords.valid"
+                                (click)="getCACertificates()">Get CA
+                                certificates</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <mat-error class="date-err" class="col-12" align="center"
+                            *ngIf="createCertificateKeyStoragePasswords.errors && createCertificateKeyStoragePasswords.errors['validKeyStoragePasword']">
+                            Please enter at least one of the passwords.
+                        </mat-error>
+                    </div>
+                </form>
                 <form [formGroup]="createCertificateFormIssuer">
                     <ng-template matStepLabel>Issuer</ng-template>
-                    <mat-form-field class="form-full-width">
+                    <mat-form-field class="form-full-width" class="col-8">
                         <mat-label>Choose existing issuer</mat-label>
-                        <mat-select formControlName="selectedIssuer">
-                            <mat-option *ngFor="let issuer of issuers" [value]="issuer">
-                                CN={{issuer.commonName}}, O={{issuer.organization}}
+                        <mat-select formControlName="selectedIssuerCertificate">
+                            <mat-option *ngFor="let issuerCertificate of issuerCertificates"
+                                [value]="issuerCertificate">
+                                CN={{issuerCertificate.subject.commonName}},
+                                O={{issuerCertificate.subject.organization}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <div *ngIf="getSelectedIssuer()">
+                    <div *ngIf="getSelectedIssuerCertificate()">
                         <mat-card>
                             <h4 class="ml-1 mb-3">Selected issuer</h4>
                             <mat-card-content>
-                                <div *ngIf="getSelectedIssuer().type == 'USER'">
+                                <div *ngIf="getSelectedIssuerCertificate().subject.type == 'USER'">
                                     <table class="table table-font">
                                         <tbody>
                                             <tr>
                                                 <th class="first">Common name</th>
-                                                <td>{{getSelectedIssuer().commonName}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.commonName}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Surname</th>
-                                                <td>{{getSelectedIssuer().surname}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.surname}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Givename</th>
-                                                <td>{{getSelectedIssuer().givename}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.givename}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Organization</th>
-                                                <td>{{getSelectedIssuer().organization}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.organization}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Email</th>
-                                                <td>{{getSelectedIssuer().email}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.email}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Country code</th>
-                                                <td>{{getSelectedIssuer().countryCode}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.countryCode}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
 
-                                <div *ngIf="getSelectedIssuer().type == 'SOFTWARE'">
+                                <div *ngIf="getSelectedIssuerCertificate().subject.type == 'SOFTWARE'">
                                     <table class="table table-font">
                                         <tbody>
                                             <tr>
                                                 <th class="first">Common name</th>
-                                                <td>{{getSelectedIssuer().commonName}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.commonName}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Organization</th>
-                                                <td>{{getSelectedIssuer().organization}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.organization}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Organization unit</th>
-                                                <td>{{getSelectedIssuer().organizationUnitName}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.organizationUnitName}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Locality</th>
-                                                <td>{{getSelectedIssuer().localityName}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.localityName}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">State/Province</th>
-                                                <td>{{getSelectedIssuer().state}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.state}}</td>
                                             </tr>
                                             <tr>
                                                 <th class="first">Country code</th>
-                                                <td>{{getSelectedIssuer().countryCode}}</td>
+                                                <td>{{getSelectedIssuerCertificate().subject.countryCode}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -204,6 +205,7 @@
                     <div class="mt-3">
                         <button mat-raised-button class="mr-3" color="primary" matStepperPrevious>Back</button>
                         <button mat-raised-button color="primary" matStepperNext
+                            (click)="setExtensionsAfterChoosingIssuer()"
                             [disabled]="!createCertificateFormIssuer.valid">Next</button>
                     </div>
                 </form>
@@ -283,49 +285,63 @@
                                 <table class="form-full-width table-font" formGroupName="keyUsage">
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="digitalSignature">Digital
+                                            <mat-checkbox formControlName="digitalSignature" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                              &&  getSelectedIssuerCertificate().keyUsage.digitalSignature == false">
+                                                Digital
                                                 Signature</mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="nonRepudiation">
+                                            <mat-checkbox formControlName="nonRepudiation" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.nonRepudiation == false">
                                                 Non Repudiation
                                             </mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="keyEncipherment"> Key
+                                            <mat-checkbox formControlName="keyEncipherment" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.keyEncipherment == false">
+                                                Key
                                                 Encipherment
                                             </mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="dataEncipherment">
+                                            <mat-checkbox formControlName="dataEncipherment" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.dataEncipherment == false">
                                                 Data Encipherment</mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="keyAgreement">Key Agreement
+                                            <mat-checkbox formControlName="keyAgreement" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.keyAgreement == false">
+                                                Key Agreement
                                             </mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="certificateSigning">Certificate
+                                            <mat-checkbox formControlName="certificateSigning" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.certificateSigning == false">
+                                                Certificate
                                                 Signing</mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="crlSign">
+                                            <mat-checkbox formControlName="crlSign" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.crlSign == false">
                                                 CRL Sign</mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="enchiperOnly">Enchiper Only
+                                            <mat-checkbox formControlName="enchiperOnly" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.enchiperOnly == false">
+                                                Enchiper Only
                                             </mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="decipherOnly">
+                                            <mat-checkbox formControlName="decipherOnly" [disabled]="checkIfIssuerCertificateKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().keyUsage.decipherOnly == false">
                                                 Decipher Only</mat-checkbox>
                                         </td>
                                     </tr>
@@ -346,32 +362,43 @@
                                 <table class="form-full-width table-font" formGroupName="extentendedKeyUsage">
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="serverAuth"> TLS Web Server
+                                            <mat-checkbox formControlName="serverAuth" [disabled]="checkIfIssuerCertificateExtendedKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().extendedKeyUsage.serverAuth == false">
+                                                TLS Web Server
                                                 Authentication</mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="codeSigning"> Code Signing
+                                            <mat-checkbox formControlName="codeSigning" [disabled]="checkIfIssuerCertificateExtendedKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().extendedKeyUsage.codeSigning == false">
+                                                Code Signing
                                             </mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="clientAuth">
+                                            <mat-checkbox formControlName="clientAuth" [disabled]="checkIfIssuerCertificateExtendedKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().extendedKeyUsage.clientAuth == false">
                                                 TLS Web Client Authentication
                                             </mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="emailProtection">
+                                            <mat-checkbox formControlName="emailProtection"
+                                                [disabled]="checkIfIssuerCertificateExtendedKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().extendedKeyUsage.emailProtection == false">
                                                 E-mail Protection</mat-checkbox>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <mat-checkbox formControlName="timeStamping">Time Stamping
+                                            <mat-checkbox formControlName="timeStamping" [disabled]="checkIfIssuerCertificateExtendedKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().extendedKeyUsage.timeStamping == false">
+                                                Time Stamping
                                             </mat-checkbox>
                                         </td>
                                         <td>
-                                            <mat-checkbox formControlName="ocspSigning"> OCSP Signing
+                                            <mat-checkbox formControlName="ocspSigning" [disabled]="checkIfIssuerCertificateExtendedKeyUsageExists()
+                                            &&  getSelectedIssuerCertificate().extendedKeyUsage.ocspSigning == false">
+                                                OCSP Signing
                                             </mat-checkbox>
                                         </td>
                                     </tr>
@@ -406,6 +433,7 @@
                             Please enter key store password.
                         </mat-error>
                     </mat-form-field>
+                    <br />
                     <mat-form-field class="field-width">
                         <input type="password" matInput formControlName="privateKeyPassword"
                             placeholder="Private Key Password">

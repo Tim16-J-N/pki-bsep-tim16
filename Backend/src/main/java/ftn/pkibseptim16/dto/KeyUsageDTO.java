@@ -163,7 +163,7 @@ public class KeyUsageDTO {
                 keyAgreement || keyEncipherment || nonRepudiation;
     }
 
-    public List<Integer> getFalseKeyUsageIdentifiers() {
+    public List<Integer> methodFalseKeyUsageIdentifiers() {
         Boolean[] booleans = {digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,
                 certificateSigning, crlSign, enchiperOnly,decipherOnly};
         Integer[] keyUsages = {0,1,2,3,4,5,6,7,8};

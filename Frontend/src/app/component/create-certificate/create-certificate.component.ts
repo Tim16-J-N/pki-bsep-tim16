@@ -13,6 +13,7 @@ import { Entity } from 'src/app/model/entity';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { Router } from '@angular/router';
 
 const TimeValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('validFrom').value;
@@ -46,13 +47,12 @@ export class CreateCertificateComponent implements OnInit {
 
   minDate = new Date();
   subjects: Entity[] = [];
-  //ovo ces morati da promenis posto on fakticki bira sertifikate a ne issuer-a. Vidi kako i sta ces slati sve ovde na frontend
-  issuers: Entity[] = [];
+  issuerCertificates: Certificate[] = [];
   createdNewSubject: Subscription;
   selectedTemplate: Template;
 
   constructor(private toastr: ToastrService, private formBuilder: FormBuilder, public dialog: MatDialog, private subjectService: SubjectService,
-    private certificateService: CertificateService) { }
+    private certificateService: CertificateService, private router: Router) { }
 
   ngOnInit() {
     this.createCertificateFormSubject = this.formBuilder.group({
@@ -67,7 +67,7 @@ export class CreateCertificateComponent implements OnInit {
     });
 
     this.createCertificateFormIssuer = this.formBuilder.group({
-      selectedIssuer: new FormControl(null, Validators.required),
+      selectedIssuerCertificate: new FormControl(null, Validators.required),
     });
 
     this.functionForCreatingFormCertificateFormOtherData();
@@ -141,8 +141,8 @@ export class CreateCertificateComponent implements OnInit {
     return this.createCertificateFormSubject.get('selectedSubject').value;
   }
 
-  getSelectedIssuer() {
-    return this.createCertificateFormIssuer.get('selectedIssuer').value;
+  getSelectedIssuerCertificate() {
+    return this.createCertificateFormIssuer.get('selectedIssuerCertificate').value;
   }
 
   createCertificate() {
@@ -164,12 +164,15 @@ export class CreateCertificateComponent implements OnInit {
     const validFrom = formatDate(this.createCertificateFormOtherData.value.validFrom, 'yyyy-MM-dd', 'en-US')
     const validTo = formatDate(this.createCertificateFormOtherData.value.validTo, 'yyyy-MM-dd', 'en-US')
 
-    const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormIssuer.value.selectedIssuer,
+    const certificate = new Certificate(this.createCertificateFormSubject.value.selectedSubject, this.createCertificateFormIssuer.value.selectedIssuerCertificate.issuer,
       validFrom, validTo, this.createCertificateFormOtherData.value.authorityKeyIdentifier, this.createCertificateFormOtherData.value.subjectKeyIdentifier,
       this.createCertificateFormOtherData.value.subjectIsCa, keyUsage, extendedKeyUsage);
-    const createCertificate = new CreateCertificate(certificate, this.createCertificateInfoAboutKeyStorage.value.alias,
+
+    const createCertificate = new CreateCertificate(certificate, this.createCertificateFormIssuer.value.selectedIssuerCertificate,
+      this.createCertificateInfoAboutKeyStorage.value.alias,
       this.createCertificateInfoAboutKeyStorage.value.password, this.createCertificateInfoAboutKeyStorage.value.privateKeyPassword,
-      this.createCertificateInfoAboutKeyStorage.value.issuerPrivateKeyPassword, this.createCertificateInfoAboutKeyStorage.value.issuerKeyStorePassword);
+      this.createCertificateInfoAboutKeyStorage.value.issuerPrivateKeyPassword,
+      this.createCertificateInfoAboutKeyStorage.value.issuerKeyStorePassword);
 
     this.certificateService.add(createCertificate).subscribe(
       () => {
@@ -178,6 +181,7 @@ export class CreateCertificateComponent implements OnInit {
         this.createCertificateFormIssuer.reset();
         this.createCertificateInfoAboutKeyStorage.reset();
         this.toastr.success('Successfully created a new certificate.', 'Create certificate');
+        this.router.navigate(['/admin/certificates']);
       },
       () => {
         this.toastr.error('Error ', 'Create certificate');
@@ -230,6 +234,23 @@ export class CreateCertificateComponent implements OnInit {
     );
   }
 
+  setExtensionsAfterChoosingIssuer() {
+    this.createCertificateFormOtherData.patchValue(
+      {
+        'keyUsage': {
+          'digitalSignature': this.selectedTemplate.digitalSigniture && this.getSelectedIssuerCertificate().keyUsage.digitalSignature,
+          'keyEncipherment': this.selectedTemplate.keyEncipherment && this.getSelectedIssuerCertificate().keyUsage.keyEncipherment,
+          'certificateSigning': this.selectedTemplate.certSigning && this.getSelectedIssuerCertificate().keyUsage.certificateSigning,
+          'crlSign': this.selectedTemplate.CRLSign && this.getSelectedIssuerCertificate().keyUsage.crlSign,
+        },
+        'extentendedKeyUsage': {
+          'serverAuth': this.selectedTemplate.TLSWebServerAuth && this.getSelectedIssuerCertificate().extendedKeyUsage.serverAuth,
+          'clientAuth': this.selectedTemplate.TLSWebClientAuth && this.getSelectedIssuerCertificate().extendedKeyUsage.clientAuth,
+          'codeSigning': this.selectedTemplate.codeSigning && this.getSelectedIssuerCertificate().extendedKeyUsage.codeSigning,
+        }
+      }
+    );
+  }
   openAddSubject() {
     this.dialog.open(AddSubjectComponent);
   }
@@ -237,8 +258,33 @@ export class CreateCertificateComponent implements OnInit {
   getCACertificates() {
     this.certificateService.getCACertificates(this.createCertificateKeyStoragePasswords.value.rootKeyStoragePassword,
       this.createCertificateKeyStoragePasswords.value.intermediateKeyStoragePassword).
-      subscribe((subjects: Entity[]) => {
-        this.subjects = subjects;
+      subscribe((issuers: Certificate[]) => {
+        this.issuerCertificates = issuers;
+      }, () => {
+        this.toastr.error('At least one password is incorrect. Please try again', 'Get CA Certificates');
       })
+  }
+
+  checkIfIssuerCertificateExtendedKeyUsageExists() {
+    const selectedIssuerCertificate = this.createCertificateFormIssuer.value.selectedIssuerCertificate;
+    if (!selectedIssuerCertificate) {
+      return false;
+    } else if (!selectedIssuerCertificate.extendedKeyUsage) {
+      return false;
+    }
+    return true;
+  }
+
+  checkIfIssuerCertificateKeyUsageExists() {
+    const selectedIssuerCertificate = this.createCertificateFormIssuer.value.selectedIssuerCertificate;
+    console.log(selectedIssuerCertificate)
+    if (!selectedIssuerCertificate) {
+      console.log("haj4")
+      return false;
+    } else if (!selectedIssuerCertificate.keyUsage) {
+      console.log("haj5")
+      return false;
+    }
+    return true;
   }
 }
