@@ -15,8 +15,9 @@ export class Certificate {
     keyUsage: KeyUsage;
     extendedKeyUsage: ExtendedKeyUsage;
     alias: string;
+    expired: boolean;
     constructor(subject: Entity, issuer: Entity, validFrom: DateTime, validTo: DateTime, authorityKeyIdentifier: boolean,
-        subjectKeyIdentifier: boolean, subjectIsCa: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, alias?: string, serialNumber?: string) {
+        subjectKeyIdentifier: boolean, subjectIsCa: boolean, keyUsage: KeyUsage, extendedKeyUsage: ExtendedKeyUsage, alias?: string, serialNumber?: string, expired?: boolean) {
         this.subject = subject;
         this.issuer = issuer;
         this.validFrom = validFrom;
@@ -28,6 +29,7 @@ export class Certificate {
         this.keyUsage = keyUsage;
         this.extendedKeyUsage = extendedKeyUsage;
         this.alias = alias;
+        this.expired = expired;
     }
 
 

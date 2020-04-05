@@ -2,7 +2,6 @@ package ftn.pkibseptim16.dto;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 
 public class CertificateDTO {
 
@@ -36,6 +35,8 @@ public class CertificateDTO {
     private ExtendedKeyUsageDTO extendedKeyUsage;
 
     private String alias;
+
+    private Boolean expired;
 
     public CertificateDTO() {
 
@@ -130,4 +131,11 @@ public class CertificateDTO {
         this.alias = alias;
     }
 
+    public Boolean getExpired() {
+        return expired;
+    }
+
+    public void setExpired(Boolean expired) {
+        this.expired = expired;
+    }
 }

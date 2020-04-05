@@ -6,9 +6,11 @@ import ftn.pkibseptim16.dto.ExtendedKeyUsageDTO;
 import ftn.pkibseptim16.dto.KeyUsageDTO;
 import ftn.pkibseptim16.enumeration.CertificateRole;
 import ftn.pkibseptim16.service.KeyStoreService;
+import ftn.pkibseptim16.service.ValidationService;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,9 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     private final String ROOT_KEYSTORE = "root_keystore.pkcs12";
     private final String INTERMEDIATE_KEYSTORE = "intermediate_keystore.pkcs12";
     private final String END_ENTITY_KEYSTORE = "end_entity_keystore.pkcs12";
+
+    @Autowired
+    private ValidationService validationService;
 
     @Override
     public void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword,
@@ -90,28 +95,29 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
     @Override
     public List<CertificateDTO> getCertificates(String role, String keyStorePassword)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException {
         String keyStorePath = getKeyStorePath(getCertificateRole(role));
         KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
-        int i = 0;
         Enumeration<String> aliases = keyStore.aliases();
         List<CertificateDTO> certificateDTOS = new ArrayList<>();
 
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            certificateDTOS.add(createCertificateDTO((X509Certificate) keyStore.getCertificate(alias), alias));
-            i++;
+            Certificate[] certificateChain = keyStore.getCertificateChain(alias);
+            CertificateDTO certificateDTO = createCertificateDTO((X509Certificate) certificateChain[0], alias);
+            certificateDTO.setExpired(!validationService.validateForOverview(certificateChain));
+            certificateDTOS.add(certificateDTO);
         }
         return certificateDTOS;
     }
 
-    // DODAJ PROVERU DA LI JE SERTIFIKAT VALIDAN
     @Override
     public List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         if (rootKeyStoragePassword.isEmpty() && intermediateKeyStoragePassword.isEmpty()) {
             throw new BadCredentialsException("You have to enter at least one of the passwords.");
         }
+
         List<CertificateDTO> certificateDTOS = new ArrayList<>();
         if (!rootKeyStoragePassword.isEmpty()) {
             loadCertificates(certificateDTOS, rootKeyStoragePassword, "root");
@@ -137,12 +143,16 @@ public class KeyStoreServiceImpl implements KeyStoreService {
             return certificateDTOS;
         }
 
-        int i = 0;
         Enumeration<String> aliases = keyStore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            certificateDTOS.add(createCertificateDTO((X509Certificate) keyStore.getCertificate(alias), alias));
-            i++;
+            Certificate[] certificatesChain = keyStore.getCertificateChain(alias);
+            try {
+                if (validationService.validate(certificatesChain)) {
+                    certificateDTOS.add(createCertificateDTO((X509Certificate) certificatesChain[0], alias));
+                }
+            } catch (NoSuchProviderException | CertificateException | NoSuchAlgorithmException e) {
+            }
         }
         return certificateDTOS;
     }

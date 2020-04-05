@@ -8,6 +8,7 @@ import ftn.pkibseptim16.model.SubjectData;
 import ftn.pkibseptim16.repository.EntityRepository;
 import ftn.pkibseptim16.service.CertificateService;
 import ftn.pkibseptim16.service.KeyStoreService;
+import ftn.pkibseptim16.service.ValidationService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -45,6 +46,9 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private KeyStoreService keyStoreService;
 
+    @Autowired
+    private ValidationService validationService;
+
     @Override
     public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws Exception {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
@@ -52,7 +56,8 @@ public class CertificateServiceImpl implements CertificateService {
 
         Date validFrom = getDate(certificateDTO.getValidFrom());
         Date validTo = getDate(certificateDTO.getValidTo());
-        if (validFrom.before(new Date()) || validFrom.after(validTo)) {
+        Date today = getToday();
+        if (validFrom.before(today) || validFrom.after(validTo)) {
             throw new BadCredentialsException("Start date of validity period must be before end date.");
         }
 
@@ -67,6 +72,7 @@ public class CertificateServiceImpl implements CertificateService {
         entityRepository.save(subject);
         return new CreatedCertificateDTO(cert);
     }
+
 
     @Override
     public CreatedCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws Exception {
@@ -84,9 +90,6 @@ public class CertificateServiceImpl implements CertificateService {
             throw new IllegalArgumentException("Start date of validity period must be before end date.");
         }
 
-        // proveri da li je vreme ok
-        // dodaj proveru da li se ekstenzije poklapaju
-        // dodaj proveru da li je sertifikat kojim zelis da potpises validan
         if (!certificateDataIsValid(certificateDTO, issuerCertificate, validFrom, validTo)) {
             throw new IllegalArgumentException("Certificate is invalid");
         }
@@ -102,6 +105,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         Certificate[] newCertificateChain = getCertificateChain(certificateRole, issuerKeyStorePassword,
                 issuerCertificate.getAlias(), cert);
+
         keyStoreService.store(createCertificateDTO.getKeyStorePassword(), createCertificateDTO.getAlias(),
                 subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), newCertificateChain);
         return new CreatedCertificateDTO(cert);
@@ -128,9 +132,12 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private Certificate[] getCertificateChain(CertificateRole certificateRole, String issuerKeyStorePassword,
-                                              String alias, Certificate cert) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+                                              String alias, Certificate cert) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException {
         Certificate[] certificateChain = keyStoreService.getCertificateChain(certificateRole, issuerKeyStorePassword,
                 alias);
+        if (!validationService.validate(certificateChain)) {
+            throw new CertificateException("Issuer's certificate is not valid");
+        }
         List<Certificate> certificateList = new ArrayList<>(Arrays.asList(certificateChain));
         certificateList.add(0, cert);
 
@@ -256,9 +263,6 @@ public class CertificateServiceImpl implements CertificateService {
                 .getCertificate(certGen.build(contentSigner));
     }
 
-    // proveri da li je vreme ok
-    // dodaj proveru da li se ekstenzije poklapaju
-    // DODAJ PROVERU DA LI JE SERTIFIKAT KOJIM ZELIS DA POTPUSES VALIDAN
     private boolean certificateDataIsValid(CertificateDTO newCertificateDTO, CertificateDTO issuerCertificate,
                                            Date validFrom, Date validTo) throws ParseException {
 
@@ -332,5 +336,15 @@ public class CertificateServiceImpl implements CertificateService {
             certificateRole = CertificateRole.ROOT;
         }
         return certificateRole;
+    }
+
+    public static Date getToday() {
+        Calendar date = new GregorianCalendar();
+
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+        return date.getTime();
     }
 }

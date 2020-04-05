@@ -308,10 +308,17 @@ export class CreateCertificateComponent implements OnInit {
   }
 
   getCACertificates() {
+    this.createCertificateFormIssuer.patchValue(
+      {
+        'selectedIssuerCertificate': null
+      }
+    );
+
     this.certificateService.getCACertificates(this.createCertificateKeyStoragePasswords.value.rootKeyStoragePassword,
       this.createCertificateKeyStoragePasswords.value.intermediateKeyStoragePassword).
       subscribe((issuers: Certificate[]) => {
         this.issuerCertificates = issuers;
+
       }, () => {
         this.toastr.error('At least one password is incorrect. Please try again', 'Get CA Certificates');
       })

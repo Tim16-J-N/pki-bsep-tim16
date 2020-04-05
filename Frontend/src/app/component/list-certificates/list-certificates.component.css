@@ -15,3 +15,7 @@ mat-card {
 .table td {
     vertical-align: middle;
 }
+
+.make-red {
+    background-color: #FF9999;
+}
