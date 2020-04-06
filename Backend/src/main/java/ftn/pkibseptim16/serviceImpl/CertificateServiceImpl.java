@@ -2,6 +2,7 @@ package ftn.pkibseptim16.serviceImpl;
 
 import ftn.pkibseptim16.dto.*;
 import ftn.pkibseptim16.enumeration.CertificateRole;
+import ftn.pkibseptim16.exceptionHandler.InvalidCertificateDataException;
 import ftn.pkibseptim16.model.Entity;
 import ftn.pkibseptim16.model.IssuerData;
 import ftn.pkibseptim16.model.SubjectData;
@@ -14,14 +15,15 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
@@ -50,7 +52,8 @@ public class CertificateServiceImpl implements CertificateService {
     private ValidationService validationService;
 
     @Override
-    public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws Exception {
+    public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
+            NoSuchAlgorithmException, NoSuchProviderException, CertificateException, IOException, OperatorCreationException, KeyStoreException {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
 
@@ -58,7 +61,7 @@ public class CertificateServiceImpl implements CertificateService {
         Date validTo = getDate(certificateDTO.getValidTo());
         Date today = getToday();
         if (validFrom.before(today) || validFrom.after(validTo)) {
-            throw new BadCredentialsException("Start date of validity period must be before end date.");
+            throw new InvalidCertificateDataException("Start date of validity period must be before end date.");
         }
 
         SubjectData subjectData = getSubject(subject);
@@ -75,23 +78,25 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     @Override
-    public CreatedCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws Exception {
+    public CreatedCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
+            NoSuchAlgorithmException, NoSuchProviderException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException,
+            OperatorCreationException {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
         CertificateDTO issuerCertificate = createCertificateDTO.getIssuerCertificate();
         Entity issuer = entityRepository.findByCommonName(issuerCertificate.getSubject().getCommonName());
         if (subject.getCommonName().equals(issuer.getCommonName())) {
-            throw new IllegalArgumentException("Issuer and subject is the same entity.");
+            throw new InvalidCertificateDataException("Issuer and subject can not be the same entity.");
         }
 
         Date validFrom = getDate(certificateDTO.getValidFrom());
         Date validTo = getDate(certificateDTO.getValidTo());
         if (validFrom.before(getToday()) || validFrom.after(validTo)) {
-            throw new IllegalArgumentException("Start date of validity period must be before end date.");
+            throw new InvalidCertificateDataException("Start date of validity period must be before end date.");
         }
 
         if (!certificateDataIsValid(certificateDTO, issuerCertificate, validFrom, validTo)) {
-            throw new IllegalArgumentException("Certificate is invalid");
+            throw new InvalidCertificateDataException("Certificate is invalid");
         }
         SubjectData subjectData = getSubject(subject);
 
@@ -148,7 +153,7 @@ public class CertificateServiceImpl implements CertificateService {
         return newCertificates;
     }
 
-    private SubjectData getSubject(Entity entity) {
+    private SubjectData getSubject(Entity entity) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         KeyPair keyPairSubject = generateKeyPair();
         if (keyPairSubject == null) {
             return null;
@@ -174,21 +179,16 @@ public class CertificateServiceImpl implements CertificateService {
         return new IssuerData(x500Name, privateKey, publicKey, issuer.getId());
     }
 
-    private KeyPair generateKeyPair() {
-        try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", "SunEC");
+    private KeyPair generateKeyPair() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", "SunEC");
 
-            ECGenParameterSpec ecsp;
-            ecsp = new ECGenParameterSpec("secp256k1");
-            kpg.initialize(ecsp);
-            // KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //ok
-            // SecureRandom random = SecureRandom.getInstance("Windows-PRNG");
-            // keyGen.initialize(3072, random);
-            return kpg.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException e) {
-            // e.printStackTrace();
-        }
-        return null;
+        ECGenParameterSpec ecsp;
+        ecsp = new ECGenParameterSpec("secp256k1");
+        kpg.initialize(ecsp);
+        // KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //ok
+        // SecureRandom random = SecureRandom.getInstance("Windows-PRNG");
+        // keyGen.initialize(3072, random);
+        return kpg.generateKeyPair();
     }
 
     private X500Name getX500Name(Entity entity) {
@@ -220,8 +220,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     }
 
+
     private X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Date validFrom,
-                                                Date validTo, CertificateDTO certificateDTO) throws Exception {
+                                                Date validTo, CertificateDTO certificateDTO) throws OperatorCreationException, CertIOException, CertificateException {
 
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256withECDSA");
         builder = builder.setProvider("BC");
@@ -263,12 +264,17 @@ public class CertificateServiceImpl implements CertificateService {
                 .getCertificate(certGen.build(contentSigner));
     }
 
+    private String formatDate(Date date) {
+        SimpleDateFormat df = new SimpleDateFormat("d.M.yyyy.");
+        return df.format(date);
+    }
+
     private boolean certificateDataIsValid(CertificateDTO newCertificateDTO, CertificateDTO issuerCertificate,
                                            Date validFrom, Date validTo) throws ParseException {
 
         if (validFrom.before(getDate(issuerCertificate.getValidFrom()))
                 || validTo.after(getDate(issuerCertificate.getValidTo()))) {
-            return false;
+            throw new InvalidCertificateDataException("Validity period of a certificate must be within validity perod of the issuer's certificate, which is from " + formatDate(validFrom) + "  to " + formatDate(validTo));
         }
 
         if (issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null) {
@@ -276,7 +282,7 @@ public class CertificateServiceImpl implements CertificateService {
             List<Integer> issuerFalseKeyUsages = issuerCertificate.getKeyUsage().methodFalseKeyUsageIdentifiers();
             for (Integer identifier : issuerFalseKeyUsages) {
                 if (!subjectFalseKeyUsages.contains(identifier)) {
-                    return false;
+                    throw new InvalidCertificateDataException("Some of the selected Key Usages cannot be set because issuer's certificate cannot sign them");
                 }
             }
         }
@@ -288,7 +294,7 @@ public class CertificateServiceImpl implements CertificateService {
                     .methodFalseExtendedKeyUsageIdentifiers();
             for (KeyPurposeId identifier : issuerFalseExtendedKeyUsages) {
                 if (!subjectFalseExtendedKeyUsages.contains(identifier)) {
-                    return false;
+                    throw new InvalidCertificateDataException("Some of the selected Extended Key Usages cannot be set because issuer's certificate cannot sign them");
                 }
             }
         }

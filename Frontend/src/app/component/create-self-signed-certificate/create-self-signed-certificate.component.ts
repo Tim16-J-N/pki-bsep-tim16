@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { AddSubjectComponent } from './../add-subject/add-subject.component';
 import { ExtendedKeyUsage } from './../../model/extended.key.usage';
 import { KeyUsage } from './../../model/key.usage';
@@ -146,8 +147,8 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
         this.toastr.success('Successfully created a new certificate.', 'Create certificate');
         this.router.navigate(['/admin/certificates']);
       },
-      () => {
-        this.toastr.error('Error ', 'Create certificate');
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Create self-signed certificate');
       }
     );
   }

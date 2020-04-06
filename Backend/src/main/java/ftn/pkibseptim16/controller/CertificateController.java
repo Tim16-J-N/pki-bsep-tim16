@@ -21,7 +21,6 @@ import java.security.cert.CertificateException;
 import java.util.List;
 
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/certificate")
 public class CertificateController {
@@ -34,32 +33,14 @@ public class CertificateController {
 
     @PostMapping(value = "/self-signed", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedCertificateDTO> createSelfSigned(@Valid @RequestBody CreateCertificateDTO createCertificateDTO) {
-        try {
-            CreatedCertificateDTO createdCertificate = certificateService.createSelfSigned(createCertificateDTO);
-
-            if (createdCertificate == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>(createdCertificate, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<CreatedCertificateDTO> createSelfSigned(@Valid @RequestBody CreateCertificateDTO createCertificateDTO) throws Exception {
+        return new ResponseEntity<>(certificateService.createSelfSigned(createCertificateDTO), HttpStatus.CREATED);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedCertificateDTO> create(@Valid @RequestBody CreateCertificateDTO createCertificateDTO) {
-        try {
-            CreatedCertificateDTO createdCertificate = certificateService.create(createCertificateDTO);
-
-            if (createdCertificate == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>(createdCertificate, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<CreatedCertificateDTO> create(@Valid @RequestBody CreateCertificateDTO createCertificateDTO) throws Exception {
+        return new ResponseEntity<>(certificateService.create(createCertificateDTO), HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/all")

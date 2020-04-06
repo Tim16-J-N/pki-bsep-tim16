@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface KeyStoreService {
     void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword, Certificate[] certificateChain)
-            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     PrivateKey getPrivateKey(CertificateRole certificateRole, String keyStorePassword, String alias, String keyPassword)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException;

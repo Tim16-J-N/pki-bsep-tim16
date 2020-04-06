@@ -220,7 +220,8 @@
                         <div class="col-6">
                             <mat-form-field>
                                 <input matInput [matDatepicker]="pickerFrom" placeholder="Valid from"
-                                    formControlName="validFrom" readonly [min]="minDate">
+                                    formControlName="validFrom" readonly [min]="minDate"
+                                    [max]="getSelectedIssuerCertificateValidTo()">
                                 <mat-datepicker-toggle matSuffix [for]="pickerFrom">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker #pickerFrom disabled="false"></mat-datepicker>
@@ -229,7 +230,8 @@
                         <div class="col-6">
                             <mat-form-field>
                                 <input matInput [matDatepicker]="pickerTo" placeholder="Valid until"
-                                    formControlName="validTo" readonly [min]="minDate">
+                                    formControlName="validTo" readonly [min]="minDate"
+                                    [max]="getSelectedIssuerCertificateValidTo()">
                                 <mat-datepicker-toggle matSuffix [for]="pickerTo">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker #pickerTo disabled="false"></mat-datepicker>

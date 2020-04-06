@@ -40,8 +40,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
     @Override
     public void store(String keyStorePassword, String alias, PrivateKey privateKey, String keyPassword,
-                      Certificate[] certificateChain)
-            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+                      Certificate[] certificateChain) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         char[] keyPassArray = keyPassword.toCharArray();
         char[] keyStorePassArray = keyStorePassword.toCharArray();
         CertificateRole certificateRole = getCertificateRole(certificateChain[0]);
@@ -209,8 +208,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
         }
     }
 
-    private KeyStore getKeyStore(String keyStorePath, String keyStorePassword)
-            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+    private KeyStore getKeyStore(String keyStorePath, String keyStorePassword) throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException {
         char[] keyStorePassArray = keyStorePassword.toCharArray();
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12");

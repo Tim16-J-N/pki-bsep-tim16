@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 const TimeValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('validFrom').value;
@@ -194,6 +195,13 @@ export class CreateCertificateComponent implements OnInit {
     return this.createCertificateFormIssuer.get('selectedIssuerCertificate').value;
   }
 
+  getSelectedIssuerCertificateValidTo() {
+    if (this.getSelectedIssuerCertificate()) {
+      return this.getSelectedIssuerCertificate().validTo;
+    }
+    return new Date();
+  }
+
   createCertificate() {
     if (this.createCertificateFormSubject.invalid) {
       this.toastr.error("Please choose subject", 'Create certificate');
@@ -231,9 +239,8 @@ export class CreateCertificateComponent implements OnInit {
         this.createCertificateInfoAboutKeyStorage.reset();
         this.toastr.success('Successfully created a new certificate.', 'Create certificate');
         this.router.navigate(['/admin/certificates']);
-      },
-      () => {
-        this.toastr.error('Please enter valid data ', 'Create certificate');
+      }, (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Create certificate');
       }
     );
   }
@@ -287,6 +294,9 @@ export class CreateCertificateComponent implements OnInit {
     if (!this.getSelectedIssuerCertificate().keyUsage) {
       return;
     }
+    if (!this.selectedTemplate) {
+      return;
+    }
     this.createCertificateFormOtherData.patchValue(
       {
         'keyUsage': {
@@ -320,8 +330,8 @@ export class CreateCertificateComponent implements OnInit {
       subscribe((issuers: Certificate[]) => {
         this.issuerCertificates = issuers;
 
-      }, () => {
-        this.toastr.error('At least one password is incorrect. Please try again', 'Get CA Certificates');
+      }, (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Create certificate');
       })
   }
 

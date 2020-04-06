@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { SubjectService } from './../../service/subject.service';
 import { Entity } from 'src/app/model/entity';
 import { Component, OnInit } from '@angular/core';
@@ -81,8 +82,8 @@ export class AddSubjectComponent implements OnInit {
         this.toastr.success('Successfully added a new subject.', 'Create subject');
         this.subjectService.createSuccessEmitter.next(subject);
       },
-      () => {
-        this.toastr.error('Subject with same email or common name already exist.', 'Create subject');
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Create subject');
       }
     );
   }

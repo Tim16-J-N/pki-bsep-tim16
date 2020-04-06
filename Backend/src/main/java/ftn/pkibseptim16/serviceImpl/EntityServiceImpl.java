@@ -2,11 +2,11 @@ package ftn.pkibseptim16.serviceImpl;
 
 import ftn.pkibseptim16.dto.EntityDTO;
 import ftn.pkibseptim16.enumeration.EntityType;
+import ftn.pkibseptim16.exceptionHandler.InvalidEntityDataException;
 import ftn.pkibseptim16.model.Entity;
 import ftn.pkibseptim16.repository.EntityRepository;
 import ftn.pkibseptim16.service.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class EntityServiceImpl implements EntityService {
     private EntityRepository entityRepository;
 
     @Override
-    public EntityDTO createSubject(EntityDTO entityDTO) throws IllegalArgumentException, BadCredentialsException {
+    public EntityDTO createSubject(EntityDTO entityDTO) throws InvalidEntityDataException {
         isSubjectValid(entityDTO);
         EntityType type = EntityType.valueOf(entityDTO.getType().toUpperCase());
 
@@ -48,21 +48,21 @@ public class EntityServiceImpl implements EntityService {
         return entityDTOS;
     }
 
-    private boolean isSubjectValid(EntityDTO entityDTO) throws IllegalArgumentException, BadCredentialsException {
+    private boolean isSubjectValid(EntityDTO entityDTO) throws InvalidEntityDataException {
         EntityType type = EntityType.valueOf(entityDTO.getType().toUpperCase());
         if (entityRepository.findByCommonName(entityDTO.getCommonName()) != null) {
-            throw new IllegalArgumentException("Subject with same common name already exist");
+            throw new InvalidEntityDataException("Subject with same common name already exist");
         }
         if (type.toString() == "USER") {
             if (entityDTO.getEmail().isEmpty() || entityDTO.getSurname().isEmpty() || entityDTO.getGivename().isEmpty()) {
-                throw new IllegalArgumentException("Some data are missing");
+                throw new InvalidEntityDataException("Some data are missing");
             }
             if (entityRepository.findByEmail(entityDTO.getEmail()) != null) {
-                throw new IllegalArgumentException("Subject with same email address already exist");
+                throw new InvalidEntityDataException("Subject with same email address already exist.");
             }
         } else {
             if (entityDTO.getOrganizationUnitName().isEmpty() || entityDTO.getLocalityName().isEmpty() || entityDTO.getState().isEmpty()) {
-                throw new IllegalArgumentException("Some data are missing");
+                throw new InvalidEntityDataException("Some data are missing");
             }
         }
         return true;

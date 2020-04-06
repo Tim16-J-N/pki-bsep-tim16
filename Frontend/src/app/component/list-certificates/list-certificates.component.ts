@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { CertificateDetailsComponent } from './../certificate-details/certificate-details.component';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
@@ -42,11 +43,12 @@ export class ListCertificatesComponent implements OnInit {
         }
 
       },
-      () => {
+      (httpErrorResponse: HttpErrorResponse) => {
         const data: Certificate[] = []
         this.certificatesDataSource = new MatTableDataSource(data)
-        this.toastr.error('Wrong password. Please try again.', 'Show certificates');
-      });
+        this.toastr.error(httpErrorResponse.error.message, 'Show certificates');
+      }
+    );
 
     // const subject = new Entity("USER", "Perica", "pera@mail.com", null, "Firma doo", "RS", "Peric", "Petar", null, null, 1);
     // const issuer = new Entity("SOFTWARE", "izdavac.com", null, "Izdavaci sertifikata", "Izdavac doo", "RS", null, null, "Novi Sad", "Vojvodina", 2);
@@ -65,8 +67,8 @@ export class ListCertificatesComponent implements OnInit {
       () => {
         this.toastr.success('Success!', 'Download certificate');
       },
-      () => {
-        this.toastr.error('Error while downloading.', 'Download certificate');
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Download certificate');
       }
     )
   }
