@@ -112,7 +112,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
     }
 
     @Override
-    public List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword)
+    public List<CertificateDTO> getCACertificates(Long subjectId, String rootKeyStoragePassword, String intermediateKeyStoragePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         if (rootKeyStoragePassword.isEmpty() && intermediateKeyStoragePassword.isEmpty()) {
             throw new BadCredentialsException("You have to enter at least one of the passwords.");
@@ -120,17 +120,17 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
         List<CertificateDTO> certificateDTOS = new ArrayList<>();
         if (!rootKeyStoragePassword.isEmpty()) {
-            loadCertificates(certificateDTOS, rootKeyStoragePassword, "root");
+            loadCertificates(subjectId, certificateDTOS, rootKeyStoragePassword, "root");
         }
 
         if (!intermediateKeyStoragePassword.isEmpty()) {
-            loadCertificates(certificateDTOS, intermediateKeyStoragePassword, "intermediate");
+            loadCertificates(subjectId, certificateDTOS, intermediateKeyStoragePassword, "intermediate");
         }
 
         return certificateDTOS;
     }
 
-    private List<CertificateDTO> loadCertificates(List<CertificateDTO> certificateDTOS, String keyStorePassword,
+    private List<CertificateDTO> loadCertificates(Long subjectId, List<CertificateDTO> certificateDTOS, String keyStorePassword,
                                                   String role) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 
         String keyStorePath = getKeyStorePath(getCertificateRole(role));
@@ -148,8 +148,11 @@ public class KeyStoreServiceImpl implements KeyStoreService {
             String alias = aliases.nextElement();
             Certificate[] certificatesChain = keyStore.getCertificateChain(alias);
             try {
-                if (validationService.validate(certificatesChain)) {
-                    certificateDTOS.add(createCertificateDTO((X509Certificate) certificatesChain[0], alias));
+                X509Certificate x509Certificate = (X509Certificate) certificatesChain[0];
+                Long subjectUniqueID = booleanArrayToLong(x509Certificate.getSubjectUniqueID());
+
+                if (subjectUniqueID != subjectId && validationService.validate(certificatesChain)) {
+                    certificateDTOS.add(createCertificateDTO(x509Certificate, alias));
                 }
             } catch (NoSuchProviderException | CertificateException | NoSuchAlgorithmException e) {
             }

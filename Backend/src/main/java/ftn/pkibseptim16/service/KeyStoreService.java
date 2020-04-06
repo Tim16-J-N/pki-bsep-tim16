@@ -24,7 +24,7 @@ public interface KeyStoreService {
     List<CertificateDTO> getCertificates(String role, String keyStorePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException;
 
-    List<CertificateDTO> getCACertificates(String rootKeyStoragePassword, String intermediateKeyStoragePassword)
+    List<CertificateDTO> getCACertificates(Long subjectId, String rootKeyStoragePassword, String intermediateKeyStoragePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     Certificate[] getCertificateChain(CertificateRole certificateRole, String keyStorePassword, String alias) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;

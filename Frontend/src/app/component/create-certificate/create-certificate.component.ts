@@ -314,7 +314,8 @@ export class CreateCertificateComponent implements OnInit {
       }
     );
 
-    this.certificateService.getCACertificates(this.createCertificateKeyStoragePasswords.value.rootKeyStoragePassword,
+    this.certificateService.getCACertificates(this.createCertificateFormSubject.value.selectedSubject.id,
+      this.createCertificateKeyStoragePasswords.value.rootKeyStoragePassword,
       this.createCertificateKeyStoragePasswords.value.intermediateKeyStoragePassword).
       subscribe((issuers: Certificate[]) => {
         this.issuerCertificates = issuers;

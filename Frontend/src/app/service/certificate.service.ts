@@ -21,7 +21,7 @@ export class CertificateService {
         return this.httpClient.post(this.url + "/self-signed", certificate);
     }
 
-    public getCACertificates(rootKeyStoragePassword, intermediateKeyStoragePassword): any {
+    public getCACertificates(id: number, rootKeyStoragePassword: string, intermediateKeyStoragePassword: string): any {
         let params = new HttpParams();
         if (rootKeyStoragePassword != null) {
             params = params.append('rootKeyStoragePassword', rootKeyStoragePassword);
@@ -30,7 +30,7 @@ export class CertificateService {
             params = params.append('intermediateKeyStoragePassword', intermediateKeyStoragePassword);
         }
 
-        return this.httpClient.get(this.url, {
+        return this.httpClient.get(this.url + "/" + id, {
             params: params
         });
     }

@@ -86,7 +86,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         Date validFrom = getDate(certificateDTO.getValidFrom());
         Date validTo = getDate(certificateDTO.getValidTo());
-        if (validFrom.before(new Date()) || validFrom.after(validTo)) {
+        if (validFrom.before(getToday()) || validFrom.after(validTo)) {
             throw new IllegalArgumentException("Start date of validity period must be before end date.");
         }
 

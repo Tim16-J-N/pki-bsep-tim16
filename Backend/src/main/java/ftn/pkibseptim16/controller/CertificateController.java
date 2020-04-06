@@ -74,12 +74,12 @@ public class CertificateController {
 
     }
 
-    @GetMapping()
+    @GetMapping(value = "/{subjectId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<CertificateDTO>> getCACertificates(@RequestParam(value = "rootKeyStoragePassword", required = false) String rootKeyStoragePassword,
+    public ResponseEntity<List<CertificateDTO>> getCACertificates(@PathVariable Long subjectId, @RequestParam(value = "rootKeyStoragePassword", required = false) String rootKeyStoragePassword,
                                                                   @RequestParam(value = "intermediateKeyStoragePassword", required = false) String intermediateKeyStoragePassword) {
         try {
-            return new ResponseEntity<>(keyStoreService.getCACertificates(rootKeyStoragePassword, intermediateKeyStoragePassword), HttpStatus.OK);
+            return new ResponseEntity<>(keyStoreService.getCACertificates(subjectId, rootKeyStoragePassword, intermediateKeyStoragePassword), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
