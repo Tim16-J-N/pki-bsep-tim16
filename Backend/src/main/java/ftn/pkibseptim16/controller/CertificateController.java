@@ -20,8 +20,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
-
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/certificate")
 public class CertificateController {
