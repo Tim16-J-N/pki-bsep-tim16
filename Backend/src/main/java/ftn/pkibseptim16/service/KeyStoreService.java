@@ -14,12 +14,14 @@ public interface KeyStoreService {
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     PrivateKey getPrivateKey(CertificateRole certificateRole, String keyStorePassword, String alias, String keyPassword)
-            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException;
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException,
+            UnrecoverableKeyException;
 
     PublicKey getPublicKey(CertificateRole certificateRole, String keyStorePassword, String alias)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
-    Certificate getCertificate(CertificateRole certificateRole, String keyStorePassword, String alias) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    Certificate getCertificate(CertificateRole certificateRole, String keyStorePassword, String alias)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     List<CertificateDTO> getCertificates(String role, String keyStorePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException;
@@ -27,6 +29,7 @@ public interface KeyStoreService {
     List<CertificateDTO> getCACertificates(Long subjectId, String rootKeyStoragePassword, String intermediateKeyStoragePassword)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
-    Certificate[] getCertificateChain(CertificateRole certificateRole, String keyStorePassword, String alias) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    Certificate[] getCertificateChain(CertificateRole certificateRole, String keyStorePassword, String alias)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
 }

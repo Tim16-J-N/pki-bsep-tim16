@@ -126,7 +126,15 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
       this.toastr.error("Please set valid period", 'Create certificate');
       return;
     }
+    if (!this.checkKeyUsage()) {
+      this.toastr.error("Please select at least one Key Usage", 'Create certificate');
+      return;
+    }
 
+    if (!this.checkExtendedKeyUsage()) {
+      this.toastr.error("Please select at least one Extended Key Usage", 'Create certificate');
+      return;
+    }
     const keyUsage = this.createKeyUsage();
     const extendedKeyUsage = this.createExtendedKeyUsage();
 
@@ -153,6 +161,11 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
     );
   }
 
+  checkKeyUsage(): boolean {
+    let keyUsage = this.createCertificateFormOtherData.value.keyUsage;
+    return keyUsage.certificateSigning || keyUsage.crlSign || keyUsage.dataEncipherment || keyUsage.decipherOnly || keyUsage.digitalSignature ||
+      keyUsage.enchiperOnly || keyUsage.keyAgreement || keyUsage.keyEncipherment || keyUsage.nonRepudiation;
+  }
   createKeyUsage(): KeyUsage {
     return new KeyUsage(this.createCertificateFormOtherData.value.keyUsage.certificateSigning,
       this.createCertificateFormOtherData.value.keyUsage.crlSign,
@@ -164,6 +177,13 @@ export class CreateSelfSignedCertificateComponent implements OnInit {
       this.createCertificateFormOtherData.value.keyUsage.keyEncipherment,
       this.createCertificateFormOtherData.value.keyUsage.nonRepudiation
     )
+  }
+
+
+  checkExtendedKeyUsage(): boolean {
+    let extentendedKeyUsage = this.createCertificateFormOtherData.value.extentendedKeyUsage;
+    return extentendedKeyUsage.serverAuth || extentendedKeyUsage.clientAuth || extentendedKeyUsage.codeSigning || extentendedKeyUsage.emailProtection ||
+      extentendedKeyUsage.timeStamping || extentendedKeyUsage.ocspSigning;
   }
 
   createExtendedKeyUsage(): ExtendedKeyUsage {

@@ -216,6 +216,15 @@ export class CreateCertificateComponent implements OnInit {
       return;
     }
 
+    if (!this.checkKeyUsage()) {
+      this.toastr.error("Please select at least one Key Usage", 'Create certificate');
+      return;
+    }
+
+    if (!this.checkExtendedKeyUsage()) {
+      this.toastr.error("Please select at least one Extended Key Usage", 'Create certificate');
+      return;
+    }
     const keyUsage = this.createKeyUsage();
     const extendedKeyUsage = this.createExtendedKeyUsage();
     const validFrom = formatDate(this.createCertificateFormOtherData.value.validFrom, 'yyyy-MM-dd', 'en-US')
@@ -243,6 +252,25 @@ export class CreateCertificateComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Create certificate');
       }
     );
+  }
+
+  checkExtendedKeyUsage(): boolean {
+    if (!this.createCertificateFormOtherData.value.subjectIsCa) {
+      return true;
+    }
+    let extentendedKeyUsage = this.createCertificateFormOtherData.value.extentendedKeyUsage;
+    return extentendedKeyUsage.serverAuth || extentendedKeyUsage.clientAuth || extentendedKeyUsage.codeSigning || extentendedKeyUsage.emailProtection ||
+      extentendedKeyUsage.timeStamping || extentendedKeyUsage.ocspSigning;
+  }
+
+  checkKeyUsage(): boolean {
+    if (!this.createCertificateFormOtherData.value.subjectIsCa) {
+      return true;
+    }
+
+    let keyUsage = this.createCertificateFormOtherData.value.keyUsage;
+    return keyUsage.certificateSigning || keyUsage.crlSign || keyUsage.dataEncipherment || keyUsage.decipherOnly || keyUsage.digitalSignature ||
+      keyUsage.enchiperOnly || keyUsage.keyAgreement || keyUsage.keyEncipherment || keyUsage.nonRepudiation;
   }
 
   createKeyUsage(): KeyUsage {

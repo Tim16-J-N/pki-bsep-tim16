@@ -63,6 +63,13 @@ public class CertificateServiceImpl implements CertificateService {
         if (validFrom.before(today) || validFrom.after(validTo)) {
             throw new InvalidCertificateDataException("Start date of validity period must be before end date.");
         }
+        if (!certificateDTO.getKeyUsage().isEnabled()) {
+            throw new InvalidCertificateDataException("You have to select at least one Key Usage.");
+        }
+
+        if (!certificateDTO.getExtendedKeyUsage().isEnabled()) {
+            throw new InvalidCertificateDataException("You have to select at least one Extended Key Usage.");
+        }
 
         SubjectData subjectData = getSubject(subject);
         IssuerData issuerData = getIssuerForSelfSigned(subjectData);
@@ -275,6 +282,14 @@ public class CertificateServiceImpl implements CertificateService {
         if (validFrom.before(getDate(issuerCertificate.getValidFrom()))
                 || validTo.after(getDate(issuerCertificate.getValidTo()))) {
             throw new InvalidCertificateDataException("Validity period of a certificate must be within validity perod of the issuer's certificate, which is from " + formatDate(validFrom) + "  to " + formatDate(validTo));
+        }
+
+        if (newCertificateDTO.getSubjectIsCa() && !newCertificateDTO.getKeyUsage().isEnabled()) {
+            throw new InvalidCertificateDataException("You have to select at least one Key Usage.");
+        }
+
+        if (newCertificateDTO.getSubjectIsCa() && !newCertificateDTO.getExtendedKeyUsage().isEnabled()) {
+            throw new InvalidCertificateDataException("You have to select at least one Extended Key Usage.");
         }
 
         if (issuerCertificate.getKeyUsage() != null && newCertificateDTO.getKeyUsage() != null) {
