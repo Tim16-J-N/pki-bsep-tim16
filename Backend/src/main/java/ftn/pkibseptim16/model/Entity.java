@@ -1,4 +1,5 @@
 package ftn.pkibseptim16.model;
+
 import ftn.pkibseptim16.enumeration.EntityType;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ public class Entity {
     @Enumerated(EnumType.STRING)
     private EntityType type;
 
-    @Column(columnDefinition = "VARCHAR(64)", nullable = false,unique = true)
+    @Column(columnDefinition = "VARCHAR(64)", nullable = false, unique = true)
     private String commonName;
 
     @Column
@@ -43,23 +44,24 @@ public class Entity {
     @Column
     private Integer numberOfRootCertificates;
 
-    public Entity(){
+    public Entity() {
         this.numberOfRootCertificates = 0;
     }
+
     public Entity(EntityType type, String commonName, String email,
                   String organizationUnitName, String organization, String countryCode, String surname, String givename, String localityName, String state) {
         this.type = type;
         this.commonName = commonName;
         this.countryCode = countryCode;
         this.organization = organization;
-        if(type.toString() == "USER"){
+        if (type.toString() == "USER") {
             this.email = email;
             this.surname = surname;
             this.givename = givename;
             this.organizationUnitName = "";
             this.localityName = "";
             this.state = "";
-        }else {
+        } else {
             this.organizationUnitName = organizationUnitName;
             this.localityName = localityName;
             this.state = state;

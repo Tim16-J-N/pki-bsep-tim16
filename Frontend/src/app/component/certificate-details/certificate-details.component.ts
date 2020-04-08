@@ -1,4 +1,4 @@
-import { Certificate } from './../../model/certificate';
+import { CertificateItem } from './../../model/certificate.item';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
@@ -10,7 +10,7 @@ import { MAT_DIALOG_DATA } from '@angular/material';
 export class CertificateDetailsComponent implements OnInit {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public selectedCert: Certificate
+    @Inject(MAT_DIALOG_DATA) public selectedCert: CertificateItem
   ) { }
 
   getSubject() {

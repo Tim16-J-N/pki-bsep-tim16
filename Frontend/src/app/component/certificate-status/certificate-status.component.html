@@ -1,0 +1,42 @@
+<h1 mat-dialog-title>Certificate Status</h1>
+<mat-dialog-content class="dialog-class">
+    <p>This certificate is: <b>{{status}}</b></p>
+
+    <mat-card *ngIf="status === 'GOOD'" class="card-bg">
+        <h5 class="mb-2">Revoke</h5>
+        <mat-card-content>
+            <form [formGroup]="revokeCertificateForm" class="form-full-width">
+                <mat-form-field class="form-full-width mb-2">
+                    <input matInput placeholder="Root Key Store Password" formControlName="rootKeyStorePass">
+                    <mat-error
+                        *ngIf="revokeCertificateForm.get('rootKeyStorePass').errors && revokeCertificateForm.get('rootKeyStorePass').errors['required']">
+                        Please enter root key store password.
+                    </mat-error>
+                </mat-form-field>
+                <br />
+                <mat-form-field class="form-full-width mb-2">
+                    <input type="password" matInput formControlName="intermediateKeyStorePass"
+                        placeholder="Intermediate Key Store Password">
+                    <mat-error
+                        *ngIf="revokeCertificateForm.get('intermediateKeyStorePass').errors && revokeCertificateForm.get('intermediateKeyStorePass').errors['required']">
+                        Please enter key store password.
+                    </mat-error>
+                </mat-form-field>
+                <br />
+                <mat-form-field class="form-full-width mb-2">
+                    <input type="password" matInput formControlName="endEntityKeyStorePass"
+                        placeholder="End-entity Key Store Password">
+                    <mat-error
+                        *ngIf="revokeCertificateForm.get('endEntityKeyStorePass').errors && revokeCertificateForm.get('endEntityKeyStorePass').errors['required']">
+                        Please enter key store password.
+                    </mat-error>
+                </mat-form-field>
+                <br />
+            </form>
+            <div align="end">
+                <button mat-raised-button color="primary" (click)="revoke()"
+                    [disabled]="!revokeCertificateForm.valid">Revoke</button>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</mat-dialog-content>

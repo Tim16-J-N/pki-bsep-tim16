@@ -1,7 +1,10 @@
 package ftn.pkibseptim16.service;
 
 import ftn.pkibseptim16.dto.CertificateDTO;
+import ftn.pkibseptim16.dto.CertificateItemDTO;
 import ftn.pkibseptim16.enumeration.CertificateRole;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.operator.OperatorCreationException;
 
 import java.io.IOException;
 import java.security.*;
@@ -23,13 +26,17 @@ public interface KeyStoreService {
     Certificate getCertificate(CertificateRole certificateRole, String keyStorePassword, String alias)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
-    List<CertificateDTO> getCertificates(String role, String keyStorePassword)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException;
+    List<CertificateItemDTO> getCertificates(String role, String keyStorePassword)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException, OCSPException, OperatorCreationException;
 
     List<CertificateDTO> getCACertificates(Long subjectId, String rootKeyStoragePassword, String intermediateKeyStoragePassword)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException;
 
     Certificate[] getCertificateChain(CertificateRole certificateRole, String keyStorePassword, String alias)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
+    KeyStore getKeyStore(String keyStorePath, String keyStorePassword)
+            throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException;
+
+    String getKeyStorePath(CertificateRole certificateRole);
 }

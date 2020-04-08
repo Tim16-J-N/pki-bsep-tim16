@@ -26,6 +26,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -42,6 +43,8 @@ import java.util.*;
 @Service
 public class CertificateServiceImpl implements CertificateService {
 
+    private final String PATH = "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator;
+
     @Autowired
     private EntityRepository entityRepository;
 
@@ -52,7 +55,7 @@ public class CertificateServiceImpl implements CertificateService {
     private ValidationService validationService;
 
     @Override
-    public CreatedCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
+    public ResponseCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
             NoSuchAlgorithmException, NoSuchProviderException, CertificateException, IOException, OperatorCreationException, KeyStoreException {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
@@ -80,12 +83,12 @@ public class CertificateServiceImpl implements CertificateService {
                 subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), new Certificate[]{cert});
         subject.setNumberOfRootCertificates(subject.getNumberOfRootCertificates() + 1);
         entityRepository.save(subject);
-        return new CreatedCertificateDTO(cert);
+        return new ResponseCertificateDTO(cert);
     }
 
 
     @Override
-    public CreatedCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
+    public ResponseCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
             NoSuchAlgorithmException, NoSuchProviderException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException,
             OperatorCreationException {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
@@ -120,7 +123,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         keyStoreService.store(createCertificateDTO.getKeyStorePassword(), createCertificateDTO.getAlias(),
                 subjectData.getPrivateKey(), createCertificateDTO.getPrivateKeyPassword(), newCertificateChain);
-        return new CreatedCertificateDTO(cert);
+        return new ResponseCertificateDTO(cert);
     }
 
     @Override
@@ -136,7 +139,7 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate certificate = keyStoreService.getCertificate(certRole, downloadCertDTO.getKeyStorePassword(),
                 alias);
 
-        FileOutputStream os = new FileOutputStream(certRoleStr + "_" + alias + ".cer");
+        FileOutputStream os = new FileOutputStream(PATH + certRoleStr + "_" + alias + ".cer");
         os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
         os.write(Base64.encodeBase64(certificate.getEncoded(), true));
         os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));

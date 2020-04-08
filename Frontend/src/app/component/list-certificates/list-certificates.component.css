@@ -8,8 +8,13 @@ mat-card {
     background-color: #00cc00;
 }
 
+.check-status-btn {
+    color: white;
+    background-color: #FFA500;
+}
+
 .buttons-width {
-    width: 30%;
+    width: 34%;
 }
 
 .table td {

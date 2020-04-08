@@ -1,6 +1,8 @@
 package ftn.pkibseptim16.exceptionHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -52,9 +54,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({CertificateEncodingException.class, KeyStoreException.class, CertificateException.class,
             NoSuchAlgorithmException.class, NoSuchProviderException.class, CertificateEncodingException.class,
-            CertificateParsingException.class, OperatorCreationException.class, CertIOException.class, InvalidAlgorithmParameterException.class})
+            CertificateParsingException.class, OperatorCreationException.class, CertIOException.class,
+            InvalidAlgorithmParameterException.class, OCSPException.class})
     protected ResponseEntity<Object> handleCertificateAndKeyStoreException() {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST);
+        ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         error.setMessage("Something went wrong. Please try again.");
         return buildResponseEntity(error);
     }
@@ -63,6 +66,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleParseException() {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST);
         error.setMessage("Date format is not valid.");
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    protected ResponseEntity<Object> handleJsonProcessingException() {
+        ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+        error.setMessage("Certificate status check failed. Please try again later.");
         return buildResponseEntity(error);
     }
 

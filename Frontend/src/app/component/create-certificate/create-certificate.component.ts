@@ -359,7 +359,7 @@ export class CreateCertificateComponent implements OnInit {
         this.issuerCertificates = issuers;
 
       }, (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Create certificate');
+        this.toastr.error(httpErrorResponse.error.message, 'Get CA certificates');
       })
   }
 

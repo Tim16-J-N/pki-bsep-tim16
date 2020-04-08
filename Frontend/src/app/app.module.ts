@@ -23,6 +23,7 @@ import { ChooseTemplateComponent } from './component/choose-template/choose-temp
 import { CreateSelfSignedCertificateComponent } from './component/create-self-signed-certificate/create-self-signed-certificate.component';
 import { MatDatepickerModule } from '@angular/material';
 import { CertificateDetailsComponent } from './component/certificate-details/certificate-details.component';
+import { CertificateStatusComponent } from './component/certificate-status/certificate-status.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { CertificateDetailsComponent } from './component/certificate-details/cer
     ChooseTemplateComponent,
     CreateSelfSignedCertificateComponent,
     CertificateDetailsComponent,
+    CertificateStatusComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,6 +65,7 @@ import { CertificateDetailsComponent } from './component/certificate-details/cer
     ListCertificatesComponent,
     ChooseTemplateComponent,
     CertificateDetailsComponent,
+    CertificateStatusComponent,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },

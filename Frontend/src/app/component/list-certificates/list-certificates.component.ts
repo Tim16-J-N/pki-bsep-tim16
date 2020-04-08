@@ -1,8 +1,10 @@
+import { OCSPService } from './../../service/ocsp.service';
+import { CertificateStatusComponent } from './../certificate-status/certificate-status.component';
+import { CertificateItem } from './../../model/certificate.item';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CertificateDetailsComponent } from './../certificate-details/certificate-details.component';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { Certificate } from './../../model/certificate';
 import { CertificateService } from './../../service/certificate.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,12 +20,13 @@ export class ListCertificatesComponent implements OnInit {
 
   keyStoreForm: FormGroup;
   displayedColumns: string[] = ['serialNumber', 'subjectCN', 'issuerCN', 'validFrom', 'validTo', 'buttons'];
-  certificatesDataSource: MatTableDataSource<Certificate>;
+  certificatesDataSource: MatTableDataSource<CertificateItem>;
 
   constructor(
     public dialog: MatDialog,
     private formBuilder: FormBuilder,
     private certificateService: CertificateService,
+    private ocspService: OCSPService,
     private toastr: ToastrService
   ) { }
 
@@ -36,7 +39,7 @@ export class ListCertificatesComponent implements OnInit {
 
   fetchCertificates() {
     this.certificateService.getCertificates(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword).subscribe(
-      (data: Certificate[]) => {
+      (data: CertificateItem[]) => {
         this.certificatesDataSource = new MatTableDataSource(data)
         if (data.length == 0) {
           this.toastr.info('No certificates the in specified KeyStore.', 'Show certificates');
@@ -44,42 +47,40 @@ export class ListCertificatesComponent implements OnInit {
 
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: Certificate[] = []
+        const data: CertificateItem[] = []
         this.certificatesDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show certificates');
       }
     );
-
-    // const subject = new Entity("USER", "Perica", "pera@mail.com", null, "Firma doo", "RS", "Peric", "Petar", null, null, 1);
-    // const issuer = new Entity("SOFTWARE", "izdavac.com", null, "Izdavaci sertifikata", "Izdavac doo", "RS", null, null, "Novi Sad", "Vojvodina", 2);
-    // const keyUsage = new KeyUsage(true, true, false, true, false, true, true, false, false);
-    // const extKeyUsg = new ExtendedKeyUsage(true, false, false, true, false, false);
-    // const cert = new Certificate(subject, issuer, "7/5/2020", "7/30/2021", true, true, false, keyUsage, extKeyUsg, 156489);
-    // this.certificatesDataSource = new MatTableDataSource([cert]);
   }
 
-  viewDetails(cert: Certificate) {
+  viewDetails(cert: CertificateItem) {
     this.dialog.open(CertificateDetailsComponent, { data: cert });
   }
 
-  download(element: Certificate) {
-    this.certificateService.download(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, element.alias).subscribe(
+  download(cert: CertificateItem) {
+    this.certificateService.download(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, cert.alias).subscribe(
       () => {
         this.toastr.success('Success!', 'Download certificate');
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Download certificate');
       }
-    )
+    );
   }
 
-  revoke(cert: Certificate) {
-
+  checkStatus(cert: CertificateItem) {
+    this.dialog.open(CertificateStatusComponent, {
+      data:
+      {
+        "cert": cert,
+        "certRole": this.keyStoreForm.value.certRole
+      }
+    });
   }
 
   openTemplatesDialog() {
     this.dialog.open(ChooseTemplateComponent);
   }
-
 
 }

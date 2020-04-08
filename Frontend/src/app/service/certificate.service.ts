@@ -1,3 +1,4 @@
+import { CertificateID } from './../model/certificate.id';
 import { CreateCertificate } from './../model/create.certificate';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from './../../environments/environment';
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
 export class CertificateService {
     url = environment.baseUrl + environment.certificate;
 
-    constructor(private httpClient: HttpClient, private router: Router) { }
+    constructor(private httpClient: HttpClient) { }
 
     public add(certificate: CreateCertificate) {
         return this.httpClient.post(this.url, certificate);
@@ -34,6 +35,7 @@ export class CertificateService {
             params: params
         });
     }
+
     public getCertificates(keyStoreLevel: string, keyStorePassword: string) {
         let params = new HttpParams();
         params = params.append('role', keyStoreLevel);

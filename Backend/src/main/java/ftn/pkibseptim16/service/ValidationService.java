@@ -9,5 +9,4 @@ public interface ValidationService {
 
     boolean validate(Certificate[] certChain) throws CertificateException, NoSuchAlgorithmException, NoSuchProviderException;
 
-    boolean validateForOverview(Certificate[] certChain) throws CertificateException, NoSuchAlgorithmException, NoSuchProviderException;
 }
