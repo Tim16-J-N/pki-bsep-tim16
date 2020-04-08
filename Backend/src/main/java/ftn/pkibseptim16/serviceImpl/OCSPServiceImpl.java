@@ -80,6 +80,12 @@ public class OCSPServiceImpl implements OCSPService {
         }
     }
 
+    @Override
+    public boolean isRevoked(Certificate certificate) {
+        OCSPItem ocspItem = ocspRepository.findBySerialNumber(((X509Certificate) certificate).getSerialNumber().toString());
+        return ocspItem == null ? false : true;
+    }
+
     private X509Certificate getCertificate(BigInteger serialNumber, CertificateRole certRole, String keyStorePassword, String alias)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         X509Certificate certificate = (X509Certificate) keyStoreService.getCertificate(certRole, keyStorePassword, alias);

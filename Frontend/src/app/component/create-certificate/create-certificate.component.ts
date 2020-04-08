@@ -325,6 +325,7 @@ export class CreateCertificateComponent implements OnInit {
     if (!this.selectedTemplate) {
       return;
     }
+    this.functionForCreatingFormCertificateFormOtherData();
     this.createCertificateFormOtherData.patchValue(
       {
         'keyUsage': {

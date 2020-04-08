@@ -1,6 +1,8 @@
 package ftn.pkibseptim16.serviceImpl;
 
+import ftn.pkibseptim16.service.OCSPService;
 import ftn.pkibseptim16.service.ValidationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.*;
@@ -9,6 +11,9 @@ import java.security.cert.*;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
+
+    @Autowired
+    private OCSPService ocspService;
 
     @Override
     public boolean validate(Certificate[] certChain) throws CertificateException, NoSuchAlgorithmException, NoSuchProviderException {
@@ -51,7 +56,6 @@ public class ValidationServiceImpl implements ValidationService {
         }
     }
 
-    //TODO: ADD CHECK OCSP LIST -> CHECK IF IS REVOKED
     private boolean validateCert(Certificate certificate, PublicKey issuerPublicKey) throws CertificateException, NoSuchAlgorithmException,
             NoSuchProviderException {
 
@@ -61,11 +65,11 @@ public class ValidationServiceImpl implements ValidationService {
             return false;
         }
 
-        if (verifySignature(certificate, issuerPublicKey)) {
-            return true;
+        if (!verifySignature(certificate, issuerPublicKey)) {
+            return false;
         }
 
-        return false;
+        return !ocspService.isRevoked(certificate);
     }
 
 }
