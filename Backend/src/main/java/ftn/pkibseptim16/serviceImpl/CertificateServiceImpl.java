@@ -197,9 +197,6 @@ public class CertificateServiceImpl implements CertificateService {
         ECGenParameterSpec ecsp;
         ecsp = new ECGenParameterSpec("secp256k1");
         kpg.initialize(ecsp);
-        // KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //ok
-        // SecureRandom random = SecureRandom.getInstance("Windows-PRNG");
-        // keyGen.initialize(3072, random);
         return kpg.generateKeyPair();
     }
 
