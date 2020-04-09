@@ -1,6 +1,5 @@
 package ftn.pkibseptim16.serviceImpl;
 
-import ftn.pkibseptim16.dto.CertificateIdDTO;
 import ftn.pkibseptim16.dto.ResponseCertificateDTO;
 import ftn.pkibseptim16.dto.RevokeCertificateDTO;
 import ftn.pkibseptim16.enumeration.CertificateRole;
@@ -36,8 +35,8 @@ public class OCSPServiceImpl implements OCSPService {
     private KeyStoreService keyStoreService;
 
     @Override
-    public CertificateStatus checkStatus(CertificateIdDTO certificateIdDTO) {
-        OCSPItem ocspItem = ocspRepository.findBySerialNumber(certificateIdDTO.getSerialNumber());
+    public CertificateStatus checkStatus(String serialNumber) {
+        OCSPItem ocspItem = ocspRepository.findBySerialNumber(serialNumber);
         if (ocspItem == null) {
             return CertificateStatus.GOOD;
         } else {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.ietf.jgss.GSSException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({CertificateEncodingException.class, KeyStoreException.class, CertificateException.class,
             NoSuchAlgorithmException.class, NoSuchProviderException.class, CertificateEncodingException.class,
             CertificateParsingException.class, OperatorCreationException.class, CertIOException.class,
-            InvalidAlgorithmParameterException.class, OCSPException.class})
+            InvalidAlgorithmParameterException.class, OCSPException.class, GSSException.class})
     protected ResponseEntity<Object> handleCertificateAndKeyStoreException() {
         ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         error.setMessage("Something went wrong. Please try again.");

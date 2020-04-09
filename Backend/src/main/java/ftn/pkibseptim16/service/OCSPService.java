@@ -1,6 +1,5 @@
 package ftn.pkibseptim16.service;
 
-import ftn.pkibseptim16.dto.CertificateIdDTO;
 import ftn.pkibseptim16.dto.ResponseCertificateDTO;
 import ftn.pkibseptim16.dto.RevokeCertificateDTO;
 import ftn.pkibseptim16.enumeration.CertificateStatus;
@@ -13,7 +12,7 @@ import java.security.cert.CertificateException;
 
 public interface OCSPService {
 
-    CertificateStatus checkStatus(CertificateIdDTO certificateIdDTO);
+    CertificateStatus checkStatus(String serialNumber);
 
     ResponseCertificateDTO revoke(RevokeCertificateDTO revokeCertDTO) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 

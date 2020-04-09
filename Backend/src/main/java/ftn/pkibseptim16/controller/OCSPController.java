@@ -3,7 +3,6 @@ package ftn.pkibseptim16.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ftn.pkibseptim16.dto.CertificateIdDTO;
 import ftn.pkibseptim16.dto.ResponseCertificateDTO;
 import ftn.pkibseptim16.dto.RevokeCertificateDTO;
 import ftn.pkibseptim16.enumeration.CertificateStatus;
@@ -31,12 +30,13 @@ public class OCSPController {
         JsonNode jsonNode = mapper.readTree(jsonString);
         JsonNode certNode = jsonNode.get("OCSP Request Data").get("Requestor List").get("Cerificate ID");
         String serialNumber = certNode.get("Serial Number").asText();
-        String issuerNameHash = certNode.get("Issuer Name Hash").asText();
-        String issuerKeyHash = certNode.get("Issuer Key Hash").asText();
-        String hashAlgorithm = certNode.get("Hash Algorithm").asText();
-        CertificateIdDTO certificateIdDTO = new CertificateIdDTO(serialNumber, issuerNameHash, issuerKeyHash, hashAlgorithm);
 
-        return new ResponseEntity<>(ocspService.checkStatus(certificateIdDTO), HttpStatus.OK);
+        return new ResponseEntity<>(ocspService.checkStatus(serialNumber), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<CertificateStatus> getCertificateStatus(@RequestParam(value = "sn", required = true) String serialNumber) {
+        return new ResponseEntity<>(ocspService.checkStatus(serialNumber), HttpStatus.OK);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -44,4 +44,6 @@ public class OCSPController {
     public ResponseEntity<ResponseCertificateDTO> revoke(@Valid @RequestBody RevokeCertificateDTO revokeCertDTO) throws Exception {
         return new ResponseEntity<>(ocspService.revoke(revokeCertDTO), HttpStatus.OK);
     }
+
+
 }

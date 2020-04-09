@@ -11,6 +11,7 @@ import ftn.pkibseptim16.service.CertificateService;
 import ftn.pkibseptim16.service.KeyStoreService;
 import ftn.pkibseptim16.service.ValidationService;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -19,10 +20,10 @@ import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.ietf.jgss.GSSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +57,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public ResponseCertificateDTO createSelfSigned(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
-            NoSuchAlgorithmException, NoSuchProviderException, CertificateException, IOException, OperatorCreationException, KeyStoreException {
+            NoSuchAlgorithmException, NoSuchProviderException, CertificateException, IOException, OperatorCreationException, KeyStoreException, GSSException {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
 
@@ -90,7 +91,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public ResponseCertificateDTO create(CreateCertificateDTO createCertificateDTO) throws ParseException, InvalidAlgorithmParameterException,
             NoSuchAlgorithmException, NoSuchProviderException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException,
-            OperatorCreationException {
+            OperatorCreationException, GSSException {
         CertificateDTO certificateDTO = createCertificateDTO.getCertificateData();
         Entity subject = entityRepository.findByCommonName(certificateDTO.getSubject().getCommonName());
         CertificateDTO issuerCertificate = createCertificateDTO.getIssuerCertificate();
@@ -139,11 +140,12 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate certificate = keyStoreService.getCertificate(certRole, downloadCertDTO.getKeyStorePassword(),
                 alias);
 
-        FileOutputStream os = new FileOutputStream(PATH + certRoleStr + "_" + alias + ".cer");
+        FileOutputStream os = new FileOutputStream(PATH + certRoleStr + "_" + alias + ".crt");
         os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
         os.write(Base64.encodeBase64(certificate.getEncoded(), true));
         os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));
         os.close();
+
     }
 
     private Certificate[] getCertificateChain(CertificateRole certificateRole, String issuerKeyStorePassword,
@@ -232,7 +234,7 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     private X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Date validFrom,
-                                                Date validTo, CertificateDTO certificateDTO) throws OperatorCreationException, CertIOException, CertificateException {
+                                                Date validTo, CertificateDTO certificateDTO) throws OperatorCreationException, CertIOException, CertificateException, GSSException {
 
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256withECDSA");
         builder = builder.setProvider("BC");
@@ -245,11 +247,11 @@ public class CertificateServiceImpl implements CertificateService {
         certGen.setIssuerUniqueID(toBooleanArray(issuerData.getId()));
 
         if (certificateDTO.getAuthorityKeyIdentifier()) {
-            certGen.addExtension(Extension.authorityKeyIdentifier, true,
+            certGen.addExtension(Extension.authorityKeyIdentifier, false,
                     new AuthorityKeyIdentifier(issuerData.getPublicKey().getEncoded()));
         }
         if (certificateDTO.getSubjectKeyIdentifier()) {
-            certGen.addExtension(Extension.subjectKeyIdentifier, true,
+            certGen.addExtension(Extension.subjectKeyIdentifier, false,
                     new SubjectKeyIdentifier(subjectData.getPublicKey().getEncoded()));
         }
         if (certificateDTO.getSubjectIsCa()) {
@@ -262,15 +264,21 @@ public class CertificateServiceImpl implements CertificateService {
                     | keyUsageDTO.getKeyAgreementInt() | keyUsageDTO.getCertificateSigningInt()
                     | keyUsageDTO.getCrlSignInt() | keyUsageDTO.getEnchiperOnlyInt()
                     | keyUsageDTO.getDecipherOnlyInt());
-            certGen.addExtension(Extension.keyUsage, true, keyUsage);
+            certGen.addExtension(Extension.keyUsage, false, keyUsage);
         }
+
         if (certificateDTO.getExtendedKeyUsage().isEnabled()) {
             ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(
                     certificateDTO.getExtendedKeyUsage().methodKeyPurposeIds());
-            certGen.addExtension(Extension.extendedKeyUsage, true, extendedKeyUsage);
+            certGen.addExtension(Extension.extendedKeyUsage, false, extendedKeyUsage);
         }
 
-        return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
+        String url = "http://localhost:8080/api/ocsp?sn=" + serialNumber.toString();
+        GeneralName generalName = new GeneralName(GeneralName.uniformResourceIdentifier, url);
+
+        AuthorityInformationAccess authorityInformationAccess = new AuthorityInformationAccess(new ASN1ObjectIdentifier("1.3.6.1.5.5.7.48.1"), generalName);
+        certGen.addExtension(Extension.authorityInfoAccess, false, authorityInformationAccess);
+        return new JcaX509CertificateConverter().setProvider("BC")
                 .getCertificate(certGen.build(contentSigner));
     }
 
