@@ -1,4 +1,4 @@
-import { OCSPService } from './../../service/ocsp.service';
+import { ValidationService } from './../../service/validation.service';
 import { CertificateStatusComponent } from './../certificate-status/certificate-status.component';
 import { CertificateItem } from './../../model/certificate.item';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -26,7 +26,7 @@ export class ListCertificatesComponent implements OnInit {
     public dialog: MatDialog,
     private formBuilder: FormBuilder,
     private certificateService: CertificateService,
-    private ocspService: OCSPService,
+    private validationService: ValidationService,
     private toastr: ToastrService
   ) { }
 
@@ -77,6 +77,21 @@ export class ListCertificatesComponent implements OnInit {
         "certRole": this.keyStoreForm.value.certRole
       }
     });
+  }
+
+  checkValidity(cert: CertificateItem) {
+    this.validationService.checkValidity(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, cert.alias).subscribe(
+      (response: String) => {
+        if (response.toUpperCase() === "VALID") {
+          this.toastr.success('This certificate is ' + response.toUpperCase() + '.', 'Certificate Validity');
+        } else {
+          this.toastr.warning('This certificate is ' + response.toUpperCase() + '.', 'Certificate Validity');
+        }
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Certificate Validity');
+      }
+    );
   }
 
   openTemplatesDialog() {

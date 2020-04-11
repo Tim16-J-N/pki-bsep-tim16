@@ -1,10 +1,15 @@
 package ftn.pkibseptim16.serviceImpl;
 
+import ftn.pkibseptim16.dto.CertAccessInfoDTO;
+import ftn.pkibseptim16.enumeration.CertificateRole;
+import ftn.pkibseptim16.enumeration.CertificateValidity;
+import ftn.pkibseptim16.service.KeyStoreService;
 import ftn.pkibseptim16.service.OCSPService;
 import ftn.pkibseptim16.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.*;
@@ -14,6 +19,9 @@ public class ValidationServiceImpl implements ValidationService {
 
     @Autowired
     private OCSPService ocspService;
+
+    @Autowired
+    private KeyStoreService keyStoreService;
 
     @Override
     public boolean validate(Certificate[] certChain) throws CertificateException, NoSuchAlgorithmException, NoSuchProviderException {
@@ -28,6 +36,21 @@ public class ValidationServiceImpl implements ValidationService {
         }
 
         return true;
+    }
+
+    @Override
+    public CertificateValidity checkValidity(CertAccessInfoDTO certAccessInfoDTO)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException {
+        String alias = certAccessInfoDTO.getAlias();
+
+        CertificateRole certRole = certAccessInfoDTO.returnCertRoleToEnum();
+        if (certRole == null) {
+            throw new NullPointerException("Undefined certificate role.");
+        }
+
+        Certificate[] certificateChain = keyStoreService.getCertificateChain(certRole, certAccessInfoDTO.getKeyStorePassword(), alias);
+
+        return validate(certificateChain) ? CertificateValidity.VALID : CertificateValidity.INVALID;
     }
 
     private boolean validateRoot(Certificate cert)

@@ -128,16 +128,16 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public void download(DownloadCertificateDTO downloadCertDTO)
+    public void download(CertAccessInfoDTO certAccessInfoDTO)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        String certRoleStr = downloadCertDTO.getCertRole().toLowerCase();
-        String alias = downloadCertDTO.getAlias();
-        CertificateRole certRole = downloadCertDTO.returnCertRoleToEnum();
+        String certRoleStr = certAccessInfoDTO.getCertRole().toLowerCase();
+        String alias = certAccessInfoDTO.getAlias();
+        CertificateRole certRole = certAccessInfoDTO.returnCertRoleToEnum();
         if (certRole == null) {
             throw new NullPointerException("Undefined certificate role.");
         }
 
-        Certificate certificate = keyStoreService.getCertificate(certRole, downloadCertDTO.getKeyStorePassword(),
+        Certificate certificate = keyStoreService.getCertificate(certRole, certAccessInfoDTO.getKeyStorePassword(),
                 alias);
 
         FileOutputStream os = new FileOutputStream(PATH + certRoleStr + "_" + alias + ".crt");

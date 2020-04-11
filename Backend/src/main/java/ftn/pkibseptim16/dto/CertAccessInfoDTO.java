@@ -4,7 +4,7 @@ import ftn.pkibseptim16.enumeration.CertificateRole;
 
 import javax.validation.constraints.NotEmpty;
 
-public class DownloadCertificateDTO {
+public class CertAccessInfoDTO {
 
     @NotEmpty(message = "Certificate role is empty.")
     private String certRole;

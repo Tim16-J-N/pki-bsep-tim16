@@ -54,7 +54,7 @@ public class CertificateController {
 
     @PostMapping(value = "/download", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> download(@Valid @RequestBody DownloadCertificateDTO downloadCertDTO) throws Exception {
+    public ResponseEntity<Void> download(@Valid @RequestBody CertAccessInfoDTO downloadCertDTO) throws Exception {
         certificateService.download(downloadCertDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }

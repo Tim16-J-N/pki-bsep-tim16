@@ -9,5 +9,6 @@ export const environment = {
   entity: '/api/entity',
   ocsp: '/api/ocsp',
   certificate: '/api/certificate',
+  validation: '/api/validation',
   auth: '/api/auth',
 };
