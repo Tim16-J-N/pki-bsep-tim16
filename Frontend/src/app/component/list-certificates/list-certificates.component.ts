@@ -1,3 +1,5 @@
+import { CertAccessInfo } from './../../model/cert.acces.info';
+import { DownloadCertificateComponent } from './../download-certificate/download-certificate.component';
 import { ValidationService } from './../../service/validation.service';
 import { CertificateStatusComponent } from './../certificate-status/certificate-status.component';
 import { CertificateItem } from './../../model/certificate.item';
@@ -59,14 +61,14 @@ export class ListCertificatesComponent implements OnInit {
   }
 
   download(cert: CertificateItem) {
-    this.certificateService.download(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, cert.alias).subscribe(
-      () => {
-        this.toastr.success('Success!', 'Download certificate');
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Download certificate');
-      }
-    );
+    this.dialog.open(DownloadCertificateComponent,
+      {
+        data: {
+          "certRole": this.keyStoreForm.value.certRole,
+          "keyStorePass": this.keyStoreForm.value.keyStorePassword,
+          "alias": cert.alias
+        }
+      });
   }
 
   checkStatus(cert: CertificateItem) {
@@ -80,7 +82,8 @@ export class ListCertificatesComponent implements OnInit {
   }
 
   checkValidity(cert: CertificateItem) {
-    this.validationService.checkValidity(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, cert.alias).subscribe(
+    let certAccessInfo = new CertAccessInfo(this.keyStoreForm.value.certRole, this.keyStoreForm.value.keyStorePassword, cert.alias);
+    this.validationService.checkValidity(certAccessInfo).subscribe(
       (response: String) => {
         if (response.toUpperCase() === "VALID") {
           this.toastr.success('This certificate is ' + response.toUpperCase() + '.', 'Certificate Validity');

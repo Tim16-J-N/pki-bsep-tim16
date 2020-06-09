@@ -3,6 +3,7 @@ package ftn.pkibseptim16.exceptionHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.ietf.jgss.GSSException;
 import org.springframework.core.Ordered;
@@ -56,7 +57,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({CertificateEncodingException.class, KeyStoreException.class, CertificateException.class,
             NoSuchAlgorithmException.class, NoSuchProviderException.class, CertificateEncodingException.class,
             CertificateParsingException.class, OperatorCreationException.class, CertIOException.class,
-            InvalidAlgorithmParameterException.class, OCSPException.class, GSSException.class})
+            InvalidAlgorithmParameterException.class, OCSPException.class, GSSException.class, CMSException.class})
     protected ResponseEntity<Object> handleCertificateAndKeyStoreException() {
         ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         error.setMessage("Something went wrong. Please try again.");

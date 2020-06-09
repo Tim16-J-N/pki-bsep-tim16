@@ -18,11 +18,15 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.ietf.jgss.GSSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +35,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
@@ -128,8 +134,11 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public void download(CertAccessInfoDTO certAccessInfoDTO)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public void download(CertDownloadInfoDTO certDownloadInfoDTO)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, CMSException, OperatorCreationException,
+            UnrecoverableKeyException {
+
+        CertAccessInfoDTO certAccessInfoDTO = certDownloadInfoDTO.getCertAccessInfo();
         String certRoleStr = certAccessInfoDTO.getCertRole().toLowerCase();
         String alias = certAccessInfoDTO.getAlias();
         CertificateRole certRole = certAccessInfoDTO.returnCertRoleToEnum();
@@ -137,16 +146,36 @@ public class CertificateServiceImpl implements CertificateService {
             throw new NullPointerException("Undefined certificate role.");
         }
 
-        Certificate certificate = keyStoreService.getCertificate(certRole, certAccessInfoDTO.getKeyStorePassword(),
-                alias);
+        PrivateKey key = keyStoreService.getPrivateKey(CertificateRole.ROOT, certDownloadInfoDTO.getRootKeyStorePass(),
+                certDownloadInfoDTO.getRootCertAlias(), certDownloadInfoDTO.getRootCertKeyPass());
+        X509Certificate certificate = (X509Certificate) keyStoreService.getCertificate(certRole, certAccessInfoDTO.getKeyStorePassword(), alias);
+        Certificate[] certificates = keyStoreService.getCertificateChain(certRole, certAccessInfoDTO.getKeyStorePassword(), alias);
+        List<Certificate> certificateList = new ArrayList<>(Arrays.asList(certificates));
+        byte[] certs = encryptCertToPKCS7(certificate, key, certificateList);
 
-        FileOutputStream os = new FileOutputStream(PATH + certRoleStr + "_" + alias + ".crt");
-        os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
-        os.write(Base64.encodeBase64(certificate.getEncoded(), true));
-        os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));
+        FileOutputStream os = new FileOutputStream(PATH + certRoleStr + "_" + alias + ".p7b");
+        os.write("-----BEGIN CERTIFICATE-----\n".getBytes(StandardCharsets.US_ASCII));
+        os.write(Base64.encodeBase64(certs, true));
+        os.write("-----END CERTIFICATE-----\n".getBytes(StandardCharsets.US_ASCII));
         os.close();
-
     }
+
+    private byte[] encryptCertToPKCS7(X509Certificate certificate, Key key, List<Certificate> certificates)
+            throws CertificateEncodingException, CMSException, IOException, OperatorCreationException {
+        CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+
+        ContentSigner sha256Signer = new JcaContentSignerBuilder("SHA256withECDSA").setProvider("BC").build((PrivateKey) key);
+        generator.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder()
+                .setProvider("BC").build())
+                .build(sha256Signer, certificate));
+        generator.addCertificates(new JcaCertStore(certificates));
+        CMSTypedData content = new CMSProcessableByteArray(certificate.getEncoded());
+
+        CMSSignedData signedData = generator.generate(content, true);
+
+        return signedData.getEncoded();
+    }
+
 
     private Certificate[] getCertificateChain(CertificateRole certificateRole, String issuerKeyStorePassword,
                                               String alias, Certificate cert) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException {

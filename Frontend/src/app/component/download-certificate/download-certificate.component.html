@@ -1,0 +1,34 @@
+<h1 mat-dialog-title>Download Certificate</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="downloadForm" class="form-full-width">
+        <mat-form-field class="form-full-width mb-2">
+            <input type="password" matInput formControlName="rootKeyStorePass" placeholder="Root Key Store Password">
+            <mat-error
+                *ngIf="downloadForm.get('rootKeyStorePass').errors && downloadForm.get('rootKeyStorePass').errors['required']">
+                Please enter root key store password.
+            </mat-error>
+        </mat-form-field>
+        <br />
+        <mat-form-field class="form-full-width mb-2">
+            <input matInput formControlName="rootCertAlias" placeholder="Root Certificate Alias">
+            <mat-error
+                *ngIf="downloadForm.get('rootCertAlias').errors && downloadForm.get('rootCertAlias').errors['required']">
+                Please enter root certificate alias.
+            </mat-error>
+        </mat-form-field>
+        <br />
+        <mat-form-field class="form-full-width mb-2">
+            <input type="password" matInput formControlName="rootCertKeyPass"
+                placeholder="Root Certificate Key Password">
+            <mat-error
+                *ngIf="downloadForm.get('rootCertKeyPass').errors && downloadForm.get('rootCertKeyPass').errors['required']">
+                Please enter root certificate key password.
+            </mat-error>
+        </mat-form-field>
+        <br />
+    </form>
+    <div align="end">
+        <button mat-raised-button color="primary" (click)="download()"
+            [disabled]="!downloadForm.valid">Download</button>
+    </div>
+</mat-dialog-content>

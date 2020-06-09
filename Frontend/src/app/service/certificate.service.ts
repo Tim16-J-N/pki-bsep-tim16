@@ -1,3 +1,4 @@
+import { CertAccessInfo } from './../model/cert.acces.info';
 import { CertificateID } from './../model/certificate.id';
 import { CreateCertificate } from './../model/create.certificate';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -46,8 +47,8 @@ export class CertificateService {
         });
     }
 
-    public download(certRole: string, keyStorePassword: string, alias: string) {
-        return this.httpClient.post(this.url + "/download", { certRole, keyStorePassword, alias });
+    public download(certAccessInfo: CertAccessInfo, rootKeyStorePass: string, rootCertAlias: string, rootCertKeyPass: string) {
+        return this.httpClient.post(this.url + "/download", { certAccessInfo, rootKeyStorePass, rootCertAlias, rootCertKeyPass });
     }
 
 }
