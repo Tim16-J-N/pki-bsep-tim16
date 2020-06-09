@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +26,16 @@ public class AdminServiceImpl implements UserDetailsService, AdminService {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void insertAfterStartup() {
         Set<Authority> authorities = authenticationService.findByName("ROLE_ADMIN");
         Admin admin = new Admin();
         admin.setUsername("pkiadmin");
-        admin.setPassword("$2a$10$uIID/dN5b4ErGnIcSbO4lORSNMun1YD76OvhSfjmgNh/wgArbzxum"); // password: tim16
+        admin.setPassword(passwordEncoder.encode("Pki.Team16"));
         admin.setAuthorities(authorities);
         if (findByUsername(admin.getUsername()) != null) {
             return;
