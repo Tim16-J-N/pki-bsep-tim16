@@ -1,5 +1,6 @@
 Keystores and Certs
-data/**
+*.p12
+*.p7b
 
 HELP.md
 target/
